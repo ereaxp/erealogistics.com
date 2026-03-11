@@ -1,0 +1,269 @@
+{
+  "seo": {
+    "title": "EREA Logistics Services | Transformación de Cadenas de Suministro",
+    "description": "Erea Logistics Services transforma cadenas de suministro en ventajas competitivas medibles en Latinoamérica."
+  },
+  "brand": {
+    "name": "EREA Logistics Services",
+    "tagline": "Transformación de Cadenas de Suministro",
+    "group": "EREA CONSULTING GROUP"
+  },
+  "nav": {
+    "about": "Nosotros",
+    "transformation": "Transformación",
+    "impact": "Impacto",
+    "team": "Equipo",
+    "contact": "Contacto",
+    "cta": "Hablar con un Partner"
+  },
+  "hero": {
+    "kicker": "EREA CONSULTING GROUP",
+    "title": "Transformamos Cadenas de Suministro en Ventajas Competitivas Medibles",
+    "subtitle": "Diseñamos e implementamos soluciones que reducen costos estructurales, liberan capital de trabajo y elevan el nivel de servicio, integrando estrategia, tecnología y analytics avanzado.",
+    "ctaPrimary": "Hablar con un Partner",
+    "ctaSecondary": "Conocer Nuestra Metodología",
+    "note": "Enfoque institucional. Resultados medibles. Implementación con disciplina.",
+    "stats": [
+      {
+        "label": "Valor incremental por negociación de fee logístico",
+        "value": "+12 Millones"
+      },
+      {
+        "label": "Reducción de cobertura",
+        "value": "-36%"
+      },
+      {
+        "label": "Reducción de costo logístico",
+        "value": "-32%"
+      }
+    ],
+    "cardNote": "Resultados referenciales de proyectos ejecutados en LATAM."
+  },
+  "about": {
+    "label": "QUIÉNES SOMOS",
+    "title": "Práctica especializada en Transformación de Cadenas de Suministro",
+    "paragraphs": [
+      "Erea Logistics Services es la práctica especializada en transformación de cadenas de suministro de EREA Consulting Group.",
+      "Combinamos experiencia ejecutiva, metodologías propias y el respaldo de EREA Decisions Lab para convertir la logística en un habilitador estratégico del negocio.",
+      "Desde el diagnóstico hasta la implementación, acompañamos a nuestros clientes en procesos de rediseño estructural que fortalecen la rentabilidad, mejoran la eficiencia operativa y preparan la organización para escalar con disciplina y control."
+    ],
+    "closing": "<b>No nos limitamos a diagnosticar.</b> Diseñamos, implementamos y aseguramos resultados."
+  },
+  "value": {
+    "label": "PROPUESTA DE VALOR",
+    "title": "La cadena de suministro es el habilitador financiero del crecimiento",
+    "description": "Una cadena de suministro correctamente diseñada reduce costos estructurales, libera capital de trabajo inmovilizado, incrementa la disponibilidad y permite escalar con eficiencia, tecnología y control.",
+    "items": [
+      {
+        "title": "Menos costos, más eficiencia",
+        "text": "Reducción del costo logístico estructural y mejoras de productividad."
+      },
+      {
+        "title": "Capital de trabajo optimizado",
+        "text": "Menos inventario inmovilizado, más rotación y control de cobertura."
+      },
+      {
+        "title": "Decisiones basadas en datos",
+        "text": "Analytics avanzado para precisión, visibilidad y ejecución disciplinada."
+      },
+      {
+        "title": "Tecnología con impacto real",
+        "text": "WMS, TMS, IBP, OMS, Demand Planning y automatización implementados con foco en valor."
+      }
+    ]
+  },
+  "transformation": {
+    "label": "TRANSFORMACIÓN",
+    "title": "Nuestros 5 frentes de actuación",
+    "description": "Intervenimos de forma integral: estrategia, procesos, tecnología e implementación, con foco en impacto financiero y sostenibilidad operativa.",
+    "items": [
+      {
+        "number": "1",
+        "title": "Estrategia y Gobernanza Supply Chain",
+        "text": "Diseñamos modelos de planificación, compras y S&OP que alinean oferta y demanda con disciplina ejecutiva y visión financiera.",
+        "impact": "Impacto: control de decisiones, reducción de variabilidad y ejecución consistente."
+      },
+      {
+        "number": "2",
+        "title": "Centros de Distribución y Automatización",
+        "text": "Diseñamos y optimizamos CD con enfoque en productividad, densidad de almacenamiento y escalabilidad, evaluando mecanización y automatización.",
+        "impact": "Impacto: mayor throughput, menor costo por línea, capacidad para crecer."
+      },
+      {
+        "number": "3",
+        "title": "Gestión Estratégica de Inventarios",
+        "text": "Modelos avanzados de reposición y segmentación que reducen excesos, minimizan quiebres y elevan la rentabilidad del inventario.",
+        "impact": "Impacto: menos DOH, más disponibilidad, mejor flujo de caja."
+      },
+      {
+        "number": "4",
+        "title": "Digitalización y Sistemas",
+        "text": "Seleccionamos e implementamos WMS, TMS e IBP asegurando que la tecnología represente fielmente la operación y entregue valor medible.",
+        "impact": "Impacto: visibilidad, control, reducción de retrabajos y ejecución."
+      },
+      {
+        "number": "5",
+        "title": "Transporte y Última Milla",
+        "text": "Rediseñamos redes, configuramos flotas y aplicamos herramientas de routing y monitoreo para reducir costos y mejorar cumplimiento.",
+        "impact": "Impacto: menor costo por entrega/km, mejor OTIF y estabilidad operativa."
+      },
+      {
+        "number": "+",
+        "title": "Metodología de Transformación",
+        "text": "Diagnóstico → Diseño → Implementación → Acompañamiento. Un proceso estructurado que asegura resultados y sostenibilidad.",
+        "impact": "Impacto: roadmap claro, quick wins y proyectos estructurales alineados al negocio."
+      }
+    ]
+  },
+  "impact": {
+    "label": "RESULTADOS",
+    "title": "Impacto cuantificado",
+    "description": "Transformamos estructuras de costo en ventajas competitivas sostenibles mediante rigor técnico y ejecución.",
+    "items": [
+      {
+        "value": "+12M",
+        "text": "Valor incremental capturado en fee logístico"
+      },
+      {
+        "value": "-36%",
+        "text": "Reducción de cobertura en categoría crítica"
+      },
+      {
+        "value": "-32%",
+        "text": "Reducción de costo logístico estructural"
+      },
+      {
+        "value": "98%",
+        "text": "Fill Rate alcanzado"
+      },
+      {
+        "value": "+350,000 m²",
+        "text": "Centros de Distribución diseñados"
+      },
+      {
+        "value": "+69,000",
+        "text": "Posiciones automatizadas implementadas"
+      }
+    ]
+  },
+  "questions": {
+    "label": "REFLEXIÓN EJECUTIVA",
+    "title": "¿Su cadena de suministro está limitando el crecimiento de su negocio?",
+    "description": "Si responde afirmativamente a varias de estas preguntas, su modelo logístico podría estar afectando su rentabilidad.",
+    "items": [
+      "¿Su inventario supera consistentemente la cobertura objetivo?",
+      "¿Tiene quiebres en productos estratégicos mientras mantiene sobreinventario en otros?",
+      "¿El costo logístico supera los benchmarks de su industria?",
+      "¿No puede cuantificar con precisión el costo real por proveedor o canal?",
+      "¿Las decisiones de compra no están integradas a un proceso formal de S&OP?",
+      "¿Sus sistemas dependen excesivamente de Excel o no están correctamente integrados?",
+      "¿El transporte representa más del 50% de su gasto logístico total?",
+      "¿Su Centro de Distribución opera al límite de su capacidad?",
+      "¿El crecimiento en ventas no se traduce proporcionalmente en crecimiento de EBITDA?"
+    ],
+    "closing": "Una cadena de suministro mal diseñada no solo genera costos invisibles. <b>Limita el crecimiento estratégico</b> de la compañía.",
+    "cta": "Solicitar Diagnóstico Estratégico"
+  },
+  "cases": {
+    "label": "EXPERIENCIA",
+    "title": "Casos de impacto",
+    "description": "Ejemplos de resultados logrados mediante intervenciones técnicas, decisión basada en datos y ejecución disciplinada.",
+    "items": [
+      {
+        "highlight": "-32% costo logístico",
+        "title": "Transformación integral en cadena de retail",
+        "text": "Rediseño de red de distribución, implementación tecnológica y optimización operativa para reducir costos estructurales y mejorar el nivel de servicio."
+      },
+      {
+        "highlight": "-36% cobertura",
+        "title": "Optimización de inventario en categoría crítica",
+        "text": "Intervención por categoría y proveedor para liberar capital de trabajo, fortalecer la salud financiera y mejorar disponibilidad."
+      },
+      {
+        "highlight": "+USD 6.2M",
+        "title": "Negociación técnica de fee logístico",
+        "text": "Metodología de costeo bottom-up y diseño de fee replicable para monetizar eficiencia y mejorar servicio de forma sostenible."
+      },
+      {
+        "highlight": "Automatización & throughput",
+        "title": "Diseño de Centro de Distribución automatizado",
+        "text": "Soluciones de alta densidad y velocidad operativa para respaldar liderazgo competitivo y crecimiento proyectado a largo plazo."
+      }
+    ]
+  },
+  "team": {
+    "label": "EQUIPO",
+    "title": "Experiencia ejecutiva, enfoque institucional",
+    "paragraphs": [
+      "Un equipo senior con experiencia internacional y más de 25 años liderando transformaciones en América Latina.",
+      "Nuestros socios combinan visión estratégica, profundidad técnica y capacidad de ejecución en sectores como retail, supermercados, industria, operadores logísticos y manufactura.",
+      "Integramos experiencia ejecutiva con analítica avanzada para asegurar decisiones basadas en datos y resultados medibles."
+    ],
+    "panelTitle": "Cómo trabajamos",
+    "panelText": "Integración de datos, tecnología y tácticas operativas para convertir la cadena de suministro en un impulsor de eficiencia y competitividad.",
+    "items": [
+      {
+        "title": "Diagnóstico técnico",
+        "text": "Análisis detallado de la cadena de suministro actual, identificando ineficiencias y oportunidades de mejora mediante datos y métricas."
+      },
+      {
+        "title": "Diseño operativo optimizado",
+        "text": "Creación de un modelo operativo personalizado que optimiza procesos, recursos y tecnología para maximizar eficiencia."
+      },
+      {
+        "title": "Implementación & liderazgo",
+        "text": "Ejecución guiada del plan con liderazgo en sitio, asegurando adopción y minimizando disrupciones."
+      },
+      {
+        "title": "Acompañamiento cultura y disciplina",
+        "text": "Soporte post-implementación para fomentar una cultura de mejora continua y disciplina operativa."
+      }
+    ]
+  },
+  "contact": {
+    "label": "CONTACTO",
+    "title": "Conversemos sobre cómo transformar su cadena de suministro",
+    "description": "Comparta un breve contexto y coordinaremos una conversación ejecutiva para evaluar oportunidades de impacto.",
+    "email": "contacto@erea.com",
+    "emailSubject": "Contacto - EREA Logistics Services",
+    "form": {
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Nombre y apellido",
+      "companyLabel": "Empresa",
+      "companyPlaceholder": "Nombre de la empresa",
+      "emailLabel": "Correo",
+      "emailPlaceholder": "correo@empresa.com",
+      "topicLabel": "Tema",
+      "topicPlaceholder": "Inventario, CD, Transporte, Tecnología, S&OP…",
+      "messageLabel": "Mensaje",
+      "messagePlaceholder": "Cuéntenos brevemente su situación y objetivos.",
+      "submit": "Agendar Reunión",
+      "emailCta": "Enviar correo",
+      "note": "Nota: este formulario es demostrativo. Conéctelo a su CRM o backend.",
+      "demoMessage": "Formulario de ejemplo. Conéctalo a tu backend/CRM (HubSpot, Forms, etc.)."
+    },
+    "expectations": {
+      "title": "Qué puede esperar",
+      "paragraphs": [
+        "Una conversación ejecutiva breve para comprender su contexto, identificar oportunidades de impacto y definir el mejor camino de trabajo.",
+        "Enfoque institucional, técnico y orientado a resultados medibles."
+      ],
+      "bullets": [
+        "Confidencialidad",
+        "Diagnóstico claro",
+        "Roadmap ejecutable"
+      ]
+    },
+    "disclaimer": "Reemplace el correo “contacto@erea.com” por el oficial de EREA Logistics Services."
+  },
+  "footer": {
+    "tagline": "Transformamos Cadenas de Suministro",
+    "company": "EREA Consulting Group",
+    "nav": {
+      "about": "Nosotros",
+      "transformation": "Transformación",
+      "impact": "Impacto",
+      "contact": "Contacto"
+    }
+  }
+}
