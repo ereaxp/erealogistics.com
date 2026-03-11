@@ -105,7 +105,7 @@
           href="#{section.id}"
           onclick={(e) => { e.preventDefault(); scrollTo(section.id); }}
           aria-current={section.id === activeSection ? 'true' : undefined}
-          class="nav-link text-label uppercase transition-colors duration-200 hover:text-text-primary {section.id === activeSection ? 'font-semibold text-accent-deep' : 'text-text-secondary'}"
+          class="text-label uppercase transition-colors duration-200 hover:text-text-primary {section.id === activeSection ? 'font-semibold text-accent-deep' : 'text-text-secondary'}"
         >
           {t.nav[section.key]}
         </a>
