@@ -3,6 +3,7 @@
   import Hero from '$lib/components/Hero.svelte';
   import Footer from '$lib/components/Footer.svelte';
   import SectionHeader from '$lib/components/SectionHeader.svelte';
+  import ShipmentTracker from '$lib/components/ShipmentTracker.svelte';
   import { reveal, stagger } from '$lib/animations/actions';
   import { scrollToSection } from '$lib/animations/gsap';
   import { toastStore } from '$lib/stores/toast.svelte';
@@ -18,6 +19,7 @@
 </script>
 
 <Nav bind:mobileOpen />
+<ShipmentTracker />
 
 <main inert={mobileOpen || undefined}>
   <Hero />
@@ -44,19 +46,19 @@
   </section>
 
   <section id="methodology" class="px-container py-section-sm">
-    <div class="mx-auto max-w-7xl rounded-[8px] bg-[linear-gradient(180deg,var(--color-accent-deep),var(--color-gradient-deep))] px-6 py-10 text-white shadow-[0_36px_90px_rgba(0,80,47,0.24)] md:px-10 md:py-12">
+    <div class="mx-auto max-w-7xl rounded-[8px] bg-[linear-gradient(180deg,var(--color-accent-deep),var(--color-gradient-deep))] px-6 py-10 text-white shadow-[0_36px_90px_rgba(var(--color-brand-rgb),0.24)] md:px-10 md:py-12">
       <SectionHeader label={t.value.label} number="02" />
       <div class="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
         <div use:reveal class="max-w-[44rem]" data-reveal>
           <h2 class="text-h2 mb-5 max-w-[12ch] font-serif tracking-snug text-white">{t.value.title}</h2>
-          <p class="text-body-lg text-white/80">{t.value.description}</p>
+          <p class="text-body-lg text-white/90">{t.value.description}</p>
         </div>
 
         <div use:stagger={{ selector: '.value-item', stagger: 0.09 }} class="grid gap-4 sm:grid-cols-2">
           {#each t.value.items as item}
             <article class="value-item rounded-[6px] border border-white/14 bg-white/8 p-5">
               <h3 class="text-h3 mb-3 font-serif text-white">{item.title}</h3>
-              <p class="text-body text-white/78">{item.text}</p>
+              <p class="text-body text-white/90">{item.text}</p>
             </article>
           {/each}
         </div>
@@ -73,14 +75,14 @@
       </div>
 
       <div use:stagger={{ selector: '.transformation-card', stagger: 0.08 }} class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {#each t.transformation.items as item}
-          <article class="transformation-card surface-card flex h-full flex-col p-6">
+        {#each t.transformation.items as item, i}
+          <article class="transformation-card group manifest-line-item flex h-full flex-col p-6">
             <div class="mb-6 flex items-center justify-between">
-              <span class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-border-subtle bg-bg-secondary font-serif text-lg text-accent-deep">{item.number}</span>
+              <span class="manifest-ref-tag">SVC-0{item.number === '+' ? '6' : item.number}</span>
             </div>
             <h3 class="text-h3 mb-3 font-serif">{item.title}</h3>
             <p class="mb-5 flex-1 text-body text-text-secondary">{item.text}</p>
-            <div class="divider-thin mb-4"></div>
+            <div class="manifest-dashed-sep mb-4"></div>
             <p class="text-sm text-accent-deep">{item.impact}</p>
           </article>
         {/each}
@@ -96,9 +98,10 @@
         <p use:reveal={{ delay: 0.08 }} class="text-body-lg text-text-secondary" data-reveal>{t.impact.description}</p>
       </div>
 
-      <div use:stagger={{ selector: '.impact-metric', stagger: 0.06 }} class="mb-10 grid gap-8 sm:grid-cols-3">
-        {#each t.impact.items.slice(0, 3) as item}
-          <div class="impact-metric">
+      <div use:stagger={{ selector: '.impact-metric', stagger: 0.06 }} class="kpi-dashboard mb-10 grid gap-8 sm:grid-cols-3">
+        {#each t.impact.items.slice(0, 3) as item, i}
+          <div class="impact-metric kpi-tile">
+            <span class="doc-ref-label" aria-hidden="true">MET-0{i + 1}</span>
             <div class="font-serif text-metric-lg tracking-tight text-accent-deep">{item.value}</div>
             <p class="mt-3 text-body text-text-secondary">{item.text}</p>
           </div>
@@ -115,9 +118,10 @@
       </div>
 
       <div use:stagger={{ selector: '.case-card', stagger: 0.08 }} class="grid gap-4 md:grid-cols-2">
-        {#each t.cases.items as item}
-          <article class="case-card surface-card p-6 md:p-7">
-            <div class="metric-chip mb-5 inline-flex text-sm font-semibold text-accent-deep">{item.highlight}</div>
+        {#each t.cases.items as item, i}
+          <article class="case-card delivery-proof-card surface-card p-6 md:p-7">
+            <span class="doc-ref-label" aria-hidden="true">CASE-0{i + 1}</span>
+            <div class="delivery-proof-stamp mb-5 inline-flex text-sm font-semibold text-accent-deep">{item.highlight}</div>
             <h3 class="text-h3 mb-3 font-serif">{item.title}</h3>
             <p class="text-body text-text-secondary">{item.text}</p>
           </article>
@@ -146,11 +150,12 @@
           </a>
         </div>
 
-        <div use:stagger={{ selector: '.question-item', stagger: 0.05 }} class="grid gap-3 md:grid-cols-2">
-          {#each t.questions.items as item}
-            <div class="question-item flex gap-3 py-3">
-              <div class="mt-2 h-2 w-2 flex-none rounded-full bg-accent"></div>
-              <p class="text-body text-text-secondary">{item}</p>
+        <div use:stagger={{ selector: '.question-item', stagger: 0.05 }} class="audit-checklist grid gap-0 md:grid-cols-2">
+          {#each t.questions.items as item, i}
+            <div class="question-item audit-row flex gap-3 py-3">
+              <span class="audit-checkbox" aria-hidden="true">&#9633;</span>
+              <p class="text-body text-text-secondary flex-1">{item}</p>
+              <span class="audit-item-num" aria-hidden="true">Q-{String(i + 1).padStart(2, '0')}</span>
             </div>
           {/each}
         </div>
@@ -175,11 +180,14 @@
         <div use:reveal class="surface-card ambient-panel p-7 md:p-9" data-reveal>
           <h3 class="text-h3 mb-3 font-serif">{t.team.panelTitle}</h3>
           <p class="mb-6 text-body text-text-secondary">{t.team.panelText}</p>
-          <div class="grid gap-3">
-            {#each t.team.items as item}
-              <div class="rounded-[4px] border border-border-subtle bg-white/72 p-4">
-                <div class="mb-2 font-medium text-accent-deep">{item.title}</div>
-                <p class="text-sm text-text-secondary">{item.text}</p>
+          <div class="workflow-steps">
+            {#each t.team.items as item, i}
+              <div class="workflow-step">
+                <span class="workflow-step-badge">{String(i + 1).padStart(2, '0')}</span>
+                <div class="workflow-step-content">
+                  <div class="mb-2 font-medium text-accent-deep">{item.title}</div>
+                  <p class="text-sm text-text-secondary">{item.text}</p>
+                </div>
               </div>
             {/each}
           </div>
@@ -198,31 +206,35 @@
 
       <div class="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
         <form onsubmit={handleDemoSubmit} class="surface-card p-7 md:p-9">
+          <p class="mb-5 flex items-center gap-2 text-sm text-text-tertiary">
+            <svg class="flex-none" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="6"/><path d="M7 4v3l2 1.5"/></svg>
+            {t.contact.form.timeEstimate}
+          </p>
           <div class="grid gap-5 md:grid-cols-2">
             <label class="block text-sm font-medium text-text-primary">
               <span class="mb-2 block">{t.contact.form.nameLabel}</span>
-              <input class="w-full rounded-[4px] border border-border-subtle bg-bg-card px-4 py-3 outline-none" name="name" placeholder={t.contact.form.namePlaceholder} required />
+              <input class="w-full rounded-[4px] border border-border-subtle bg-bg-card px-4 py-3" name="name" placeholder={t.contact.form.namePlaceholder} required />
             </label>
 
             <label class="block text-sm font-medium text-text-primary">
               <span class="mb-2 block">{t.contact.form.companyLabel}</span>
-              <input class="w-full rounded-[4px] border border-border-subtle bg-bg-card px-4 py-3 outline-none" name="company" placeholder={t.contact.form.companyPlaceholder} required />
+              <input class="w-full rounded-[4px] border border-border-subtle bg-bg-card px-4 py-3" name="company" placeholder={t.contact.form.companyPlaceholder} required />
             </label>
 
             <label class="block text-sm font-medium text-text-primary">
               <span class="mb-2 block">{t.contact.form.emailLabel}</span>
-              <input class="w-full rounded-[4px] border border-border-subtle bg-bg-card px-4 py-3 outline-none" name="email" type="email" placeholder={t.contact.form.emailPlaceholder} required />
+              <input class="w-full rounded-[4px] border border-border-subtle bg-bg-card px-4 py-3" name="email" type="email" placeholder={t.contact.form.emailPlaceholder} required />
             </label>
 
             <label class="block text-sm font-medium text-text-primary">
               <span class="mb-2 block">{t.contact.form.topicLabel}</span>
-              <input class="w-full rounded-[4px] border border-border-subtle bg-bg-card px-4 py-3 outline-none" name="topic" placeholder={t.contact.form.topicPlaceholder} required />
+              <input class="w-full rounded-[4px] border border-border-subtle bg-bg-card px-4 py-3" name="topic" placeholder={t.contact.form.topicPlaceholder} required />
             </label>
           </div>
 
           <label class="mt-5 block text-sm font-medium text-text-primary">
             <span class="mb-2 block">{t.contact.form.messageLabel}</span>
-            <textarea class="min-h-[132px] w-full rounded-[4px] border border-border-subtle bg-bg-card px-4 py-3 outline-none" name="message" placeholder={t.contact.form.messagePlaceholder}></textarea>
+            <textarea class="min-h-[132px] w-full rounded-[4px] border border-border-subtle bg-bg-card px-4 py-3" name="message" placeholder={t.contact.form.messagePlaceholder}></textarea>
           </label>
 
           <div class="mt-6 flex flex-wrap gap-3">

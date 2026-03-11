@@ -159,20 +159,23 @@
     </div>
   </div>
 
-  {#if mobileOpen}
-    <div
-      bind:this={mobileMenuEl}
-      id="mobile-menu"
-      class="bg-bg-primary lg:hidden"
-      style="border-top: 1px solid var(--color-border-subtle); margin-left: calc(-1 * var(--spacing-container)); margin-right: calc(-1 * var(--spacing-container));"
-    >
+  <div
+    bind:this={mobileMenuEl}
+    id="mobile-menu"
+    class="mobile-menu lg:hidden"
+    class:mobile-menu-open={mobileOpen}
+    aria-hidden={!mobileOpen}
+  >
+    <div class="mobile-menu-inner bg-bg-primary" style="border-top: 1px solid var(--color-border-subtle); margin-left: calc(-1 * var(--spacing-container)); margin-right: calc(-1 * var(--spacing-container));">
       <div class="mx-auto flex max-w-7xl flex-col gap-2 px-container py-4">
-        {#each sections as section}
+        {#each sections as section, i}
           <a
             href="#{section.id}"
             onclick={(e) => { e.preventDefault(); scrollTo(section.id); }}
             aria-current={section.id === activeSection ? 'true' : undefined}
+            tabindex={mobileOpen ? 0 : -1}
             class="mobile-nav-link py-2.5 text-label uppercase transition-colors duration-200 hover:text-text-primary {section.id === activeSection ? 'mobile-nav-link-active text-accent-deep' : 'text-text-secondary'}"
+            style="transition-delay: {mobileOpen ? i * 40 : 0}ms;"
           >
             {t.nav[section.key]}
           </a>
@@ -181,23 +184,42 @@
         <a
           href="#contact"
           onclick={(e) => { e.preventDefault(); scrollTo('contact'); }}
+          tabindex={mobileOpen ? 0 : -1}
           class="button-primary mt-2 w-full px-4 py-3 text-center text-sm"
+          style="transition-delay: {mobileOpen ? sections.length * 40 : 0}ms;"
         >
           {t.nav.cta}
         </a>
       </div>
     </div>
-  {/if}
+  </div>
 </nav>
 
 <style>
   .nav-link {
-    padding-bottom: 2px;
-    border-bottom: 2px solid transparent;
+    position: relative;
+    padding-bottom: 4px;
   }
 
-  .nav-link-active {
-    border-bottom: 2px solid var(--color-accent);
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--color-accent);
+    transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1), left 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
+    left: 0;
+  }
+
+  .nav-link-active::after {
+    width: 100%;
+    left: 0;
   }
 
   .nav-lang-toggle {
@@ -209,5 +231,49 @@
   .mobile-nav-link-active {
     border-left: 2px solid var(--color-accent);
     padding-left: 0.75rem;
+  }
+
+  .mobile-menu {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .mobile-menu-open {
+    grid-template-rows: 1fr;
+  }
+
+  .mobile-menu-inner {
+    overflow: hidden;
+  }
+
+  .mobile-menu .mobile-nav-link,
+  .mobile-menu :global(.button-primary) {
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1), transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), color 0.2s ease;
+  }
+
+  .mobile-menu-open .mobile-nav-link,
+  .mobile-menu-open :global(.button-primary) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-link::after {
+      transition: none;
+    }
+
+    .mobile-menu {
+      transition: none;
+    }
+
+    .mobile-menu .mobile-nav-link,
+    .mobile-menu :global(.button-primary) {
+      transition: color 0.2s ease;
+      opacity: 1;
+      transform: none;
+    }
   }
 </style>

@@ -46,9 +46,9 @@
     background: var(--color-bg-card);
     border: 0.5px solid var(--color-border-subtle);
     border-radius: 4px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 16px var(--color-brand-10);
     pointer-events: auto;
-    animation: toast-in 0.25s ease-out;
+    animation: toast-in 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     border-left: 3px solid var(--color-text-tertiary);
   }
   .toast-success {

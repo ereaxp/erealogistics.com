@@ -26,16 +26,19 @@
     "notePills": ["Enfoque institucional", "Resultados medibles", "Implementación con disciplina"],
     "stats": [
       {
-        "label": "Valor incremental por negociación de fee logístico",
-        "value": "+12 Millones"
+        "label": "Valor por negociación de fee logístico",
+        "value": "+12 Millones",
+        "direction": "up"
       },
       {
         "label": "Reducción de cobertura",
-        "value": "-36%"
+        "value": "-36%",
+        "direction": "down"
       },
       {
         "label": "Reducción de costo logístico",
-        "value": "-32%"
+        "value": "-32%",
+        "direction": "down"
       }
     ],
     "cardNote": "Resultados referenciales de proyectos ejecutados en LATAM.",
@@ -241,6 +244,7 @@
       "messagePlaceholder": "Cuéntenos brevemente su situación y objetivos.",
       "submit": "Agendar Reunión",
       "emailCta": "Enviar correo",
+      "timeEstimate": "Toma menos de 2 minutos",
       "note": "Nota: este formulario es demostrativo. Conéctelo a su CRM o backend.",
       "demoMessage": "Formulario de ejemplo. Conéctalo a tu backend/CRM (HubSpot, Forms, etc.)."
     },

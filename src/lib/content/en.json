@@ -26,16 +26,19 @@
     "notePills": ["Institutional approach", "Measurable results", "Disciplined execution"],
     "stats": [
       {
-        "label": "Incremental value from logistics fee negotiation",
-        "value": "+12 Million"
+        "label": "Logistics fee negotiation uplift",
+        "value": "+12 Million",
+        "direction": "up"
       },
       {
         "label": "Coverage reduction",
-        "value": "-36%"
+        "value": "-36%",
+        "direction": "down"
       },
       {
         "label": "Logistics cost reduction",
-        "value": "-32%"
+        "value": "-32%",
+        "direction": "down"
       }
     ],
     "cardNote": "Reference results from LATAM projects.",
@@ -241,6 +244,7 @@
       "messagePlaceholder": "Briefly describe your situation and objectives.",
       "submit": "Schedule a Meeting",
       "emailCta": "Send email",
+      "timeEstimate": "Takes less than 2 minutes",
       "note": "Note: this is a demo form. Connect it to your CRM or backend.",
       "demoMessage": "Example form. Connect it to your backend/CRM (HubSpot, Forms, etc.)."
     },

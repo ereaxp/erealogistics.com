@@ -6,7 +6,6 @@
 
 <img
   src="{base}/group-logo.svg"
-  alt=""
-  aria-hidden="true"
+  alt="EREA Consulting Group"
   style="height: {size}px; width: auto; display: block;"
 />

@@ -8,18 +8,44 @@
   --color-bg-tertiary: #E5F1E8;
   --color-bg-card: #FEFFFB;
 
-  --color-border-subtle: rgba(27, 107, 74, 0.10);
-  --color-border-medium: rgba(27, 107, 74, 0.18);
+  --color-brand-rgb: 40, 121, 90;
+  --color-brand-3: rgba(var(--color-brand-rgb), 0.03);
+  --color-brand-5: rgba(var(--color-brand-rgb), 0.05);
+  --color-brand-8: rgba(var(--color-brand-rgb), 0.08);
+  --color-brand-10: rgba(var(--color-brand-rgb), 0.10);
+  --color-brand-14: rgba(var(--color-brand-rgb), 0.14);
+  --color-brand-16: rgba(var(--color-brand-rgb), 0.16);
+  --color-brand-18: rgba(var(--color-brand-rgb), 0.18);
+  --color-brand-22: rgba(var(--color-brand-rgb), 0.22);
+  --color-brand-28: rgba(var(--color-brand-rgb), 0.28);
+  --color-brand-36: rgba(var(--color-brand-rgb), 0.36);
+  --color-brand-42: rgba(var(--color-brand-rgb), 0.42);
+  --color-brand-48: rgba(var(--color-brand-rgb), 0.48);
+  --color-brand-52: rgba(var(--color-brand-rgb), 0.52);
 
-  --color-text-primary: #15372B;
-  --color-text-secondary: #3A5E4F;
-  --color-text-tertiary: #6B8278;
+  --color-accent-rgb: 61, 211, 132;
+  --color-accent-18: rgba(var(--color-accent-rgb), 0.18);
+  --color-accent-36: rgba(var(--color-accent-rgb), 0.36);
+  --color-accent-72: rgba(var(--color-accent-rgb), 0.72);
+
+  --color-border-subtle: var(--color-brand-10);
+  --color-border-medium: var(--color-brand-18);
+
+  --color-text-primary: #163A2D;
+  --color-text-secondary: #3A6252;
+  --color-text-tertiary: #6A867A;
 
   --color-accent: #3DD384;
-  --color-accent-deep: #1B6B4A;
-  --color-accent-soft: #7ECFA5;
-  --color-gradient-deep: #0F4A32;
+  --color-accent-deep: #28795A;
+  --color-accent-soft: #82D4A8;
+  --color-gradient-deep: #1A6B4E;
   --color-focus: #B87530;
+
+  --color-white-soft: rgba(255, 255, 255, 0.82);
+  --color-white-muted: rgba(255, 255, 255, 0.74);
+
+  --shadow-card: 0 18px 42px var(--color-brand-5);
+  --shadow-lift: 0 14px 28px var(--color-accent-18);
 
   --font-serif: 'Equity', Georgia, 'Times New Roman', serif;
   --font-sans: 'Concourse', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -60,7 +86,7 @@
 
   ::selection {
     background: var(--color-accent);
-    color: #fff;
+    color: var(--color-bg-card);
   }
 
   :focus-visible {
@@ -76,6 +102,33 @@
   [data-reveal] {
     opacity: 0;
   }
+
+  input:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: -1px;
+    border-color: var(--color-focus);
+    box-shadow: 0 0 0 4px rgba(184, 117, 48, 0.1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    a, button, input, textarea {
+      transition: none;
+    }
+
+    .lift-on-hover {
+      transition: none;
+    }
+  }
+}
+
+html:not(.fonts-ready) [data-reveal] {
+  opacity: 1;
+}
+
+noscript + * [data-reveal],
+.no-js [data-reveal] {
+  opacity: 1 !important;
 }
 
 @utility px-container {
@@ -143,24 +196,24 @@
   display: block;
   width: 100%;
   height: 1px;
-  background: linear-gradient(90deg, rgba(27, 107, 74, 0.28), rgba(27, 107, 74, 0.04));
+  background: linear-gradient(90deg, var(--color-brand-28), rgba(var(--color-brand-rgb), 0.04));
   transform-origin: left center;
 }
 
 @utility divider-thin {
   height: 1px;
-  background: rgba(27, 107, 74, 0.1);
+  background: var(--color-brand-10);
 }
 
 @utility surface-card {
   background: var(--color-bg-card);
   border: 1px solid var(--color-border-subtle);
   border-radius: 6px;
-  box-shadow: 0 18px 42px rgba(27, 107, 74, 0.05);
+  box-shadow: var(--shadow-card);
 }
 
 @utility surface-card-soft {
-  background: rgba(255, 255, 255, 0.82);
+  background: var(--color-white-soft);
   border: 1px solid var(--color-border-subtle);
   border-radius: 4px;
 }
@@ -172,8 +225,8 @@
   gap: 0.6rem;
   border-radius: 4px;
   background: var(--color-accent-deep);
-  color: #fff;
-  border: 1px solid rgba(27, 107, 74, 0.16);
+  color: var(--color-bg-card);
+  border: 1px solid var(--color-brand-16);
   padding: 0.75rem 1.5rem;
   font-weight: 600;
 }
@@ -184,7 +237,7 @@
   justify-content: center;
   gap: 0.6rem;
   border-radius: 4px;
-  border: 1px solid rgba(27, 107, 74, 0.18);
+  border: 1px solid var(--color-border-medium);
   color: var(--color-accent-deep);
   padding: 0.95rem 1.25rem;
   font-weight: 600;
@@ -193,8 +246,8 @@
 
 @utility metric-chip {
   border-radius: 4px;
-  border: 1px solid rgba(27, 107, 74, 0.1);
-  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-white-muted);
   padding: 0.55rem 0.85rem;
 }
 
@@ -231,6 +284,27 @@ html.lenis, html.lenis body {
   }
 }
 
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-accent-deep);
+  color: var(--color-bg-card);
+  border-radius: 0 0 4px 4px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: top 0.15s ease-out;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
 .ambient-panel {
   position: relative;
   overflow: hidden;
@@ -238,11 +312,251 @@ html.lenis, html.lenis body {
 
 .lift-on-hover {
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.2s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .lift-on-hover:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 14px 28px rgba(61, 211, 132, 0.18);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+}
+
+.lift-on-hover:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px var(--color-brand-10);
+  transition-duration: 0.08s;
+}
+
+/* ── Supply Chain Document Aesthetic ── */
+
+/* Manifest reference tag (SVC-01 style) */
+.manifest-ref-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-bg-card);
+  background: var(--color-accent-deep);
+  border-radius: 2px;
+  line-height: 1.4;
+}
+
+/* Manifest line item card */
+.manifest-line-item {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-left: 3px solid var(--color-accent-deep);
+  border-radius: 6px;
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.manifest-line-item:hover {
+  border-left-color: var(--color-accent);
+  border-color: var(--color-accent-soft);
+  box-shadow: 0 18px 42px var(--color-accent-18);
+}
+
+/* Dashed separator inside manifest cards */
+.manifest-dashed-sep {
+  height: 0;
+  border-top: 1.5px dashed var(--color-brand-14);
+}
+
+/* ── KPI Dashboard Tiles ── */
+.kpi-dashboard {
+  position: relative;
+}
+
+/* Crop marks on metrics container */
+.kpi-dashboard::before,
+.kpi-dashboard::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+.kpi-dashboard::before {
+  top: -8px;
+  left: -8px;
+  border-top: 1.5px solid var(--color-brand-28);
+  border-left: 1.5px solid var(--color-brand-28);
+}
+
+.kpi-dashboard::after {
+  bottom: -8px;
+  right: -8px;
+  border-bottom: 1.5px solid var(--color-brand-28);
+  border-right: 1.5px solid var(--color-brand-28);
+}
+
+/* Shared faint reference label (MET-01, CASE-01 style) */
+.doc-ref-label {
+  position: absolute;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--color-brand-28);
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi-tile {
+  position: relative;
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-bg-card);
+  border-radius: 0;
+  padding: 1.25rem;
+  overflow: hidden;
+}
+
+/* Gradient top accent bar via pseudo-element (avoids border-image repaint cost) */
+.kpi-tile::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-accent-deep), var(--color-accent));
+}
+
+.kpi-tile .doc-ref-label {
+  top: 0.5rem;
+  right: 0.65rem;
+}
+
+/* ── Delivery Proof Cards ── */
+.delivery-proof-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.delivery-proof-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-accent-deep);
+}
+
+.delivery-proof-card .doc-ref-label {
+  top: 0.65rem;
+  right: 0.75rem;
+}
+
+.delivery-proof-stamp {
+  border-radius: 4px;
+  border: 1.5px dashed var(--color-brand-22);
+  background: var(--color-white-muted);
+  padding: 0.55rem 0.85rem;
+  transform: rotate(-1.5deg);
+  display: inline-flex;
+}
+
+/* ── Audit Checklist ── */
+.audit-checklist {
+  border: 1.5px dashed var(--color-brand-14);
+  border-radius: 4px;
+  padding: 0.5rem 0;
+}
+
+.audit-row {
+  padding-inline: 1rem;
+  border-bottom: 1px dashed var(--color-brand-8);
+}
+
+.audit-row:last-child {
+  border-bottom: none;
+}
+
+/* Align items spanning 2 cols: remove bottom border for last 2 items on md+ */
+@media (min-width: 768px) {
+  .audit-row:nth-last-child(-n+2) {
+    border-bottom: none;
+  }
+}
+
+.audit-checkbox {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--color-accent-deep);
+  flex-shrink: 0;
+  width: 1.1rem;
+  text-align: center;
+}
+
+.audit-item-num {
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--color-brand-22);
+  white-space: nowrap;
+  align-self: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Workflow Steps ── */
+.workflow-steps {
+  position: relative;
+  display: grid;
+  gap: 0;
+  padding-left: 2rem;
+}
+
+/* Connecting vertical line */
+.workflow-steps::before {
+  content: '';
+  position: absolute;
+  left: 0.65rem;
+  top: 1rem;
+  bottom: 1rem;
+  width: 0;
+  border-left: 1.5px dashed var(--color-brand-18);
+}
+
+.workflow-step {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px dashed var(--color-brand-10);
+}
+
+.workflow-step:last-child {
+  border-bottom: none;
+}
+
+.workflow-step-badge {
+  position: absolute;
+  left: -2rem;
+  top: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-bg-card);
+  background: var(--color-accent-deep);
+  border-radius: 2px;
+  z-index: 1;
+}
+
+.workflow-step-content {
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-bg-card);
+  border-radius: 4px;
+  padding: 1rem;
+  flex: 1;
 }

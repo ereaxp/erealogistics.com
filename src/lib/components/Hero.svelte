@@ -1,23 +1,104 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { getContent } from '$lib/stores/lang.svelte';
   import { reveal, stagger, countUp } from '$lib/animations/actions';
-  import { scrollToSection } from '$lib/animations/gsap';
+  import { scrollToSection, prefersReducedMotion } from '$lib/animations/gsap';
+  import { gsap } from 'gsap';
 
   let t = $derived(getContent());
+  let blueprintSvg: SVGSVGElement;
+  let scrollPromptVisible = $state(true);
+
+  function handleScroll() {
+    if (window.scrollY > 80) {
+      scrollPromptVisible = false;
+    }
+  }
 
   function parseStatValue(value: string): { numeric: string; prefix: string; suffix: string } {
     const match = value.match(/^([+-]?)(\d[\d,.]*)(.*)$/);
     if (!match) return { numeric: '0', prefix: '', suffix: value };
     return { numeric: match[2], prefix: match[1], suffix: match[3] };
   }
+
+
+  onMount(() => {
+    if (!blueprintSvg || prefersReducedMotion()) return;
+
+    const routes = blueprintSvg.querySelectorAll('.route');
+    const lanes = blueprintSvg.querySelectorAll('.lane');
+    const hubs = blueprintSvg.querySelectorAll('.hub');
+    const nodes = blueprintSvg.querySelectorAll('.node');
+    const labels = blueprintSvg.querySelectorAll('.hub-label');
+
+    // Prepare routes for stroke drawing
+    routes.forEach(route => {
+      const length = (route as SVGPathElement).getTotalLength();
+      gsap.set(route, { strokeDasharray: length, strokeDashoffset: length });
+    });
+    lanes.forEach(lane => {
+      const length = (lane as SVGPathElement).getTotalLength();
+      gsap.set(lane, { strokeDasharray: length, strokeDashoffset: length });
+    });
+
+    gsap.set(hubs, { scale: 0, transformOrigin: 'center center' });
+    gsap.set(nodes, { scale: 0, transformOrigin: 'center center' });
+    gsap.set(labels, { opacity: 0 });
+
+    const tl = gsap.timeline({ delay: 0.6 });
+
+    // Draw routes
+    tl.to(routes, {
+      strokeDashoffset: 0,
+      duration: 1.8,
+      stagger: 0.3,
+      ease: 'power2.inOut',
+    });
+
+    // Draw lanes slightly after
+    tl.to(lanes, {
+      strokeDashoffset: 0,
+      duration: 1.2,
+      stagger: 0.15,
+      ease: 'power2.inOut',
+    }, '-=1.4');
+
+    // Pop in hubs
+    tl.to(hubs, {
+      scale: 1,
+      duration: 0.5,
+      stagger: 0.08,
+      ease: 'back.out(2)',
+    }, '-=0.8');
+
+    // Fade in nodes
+    tl.to(nodes, {
+      scale: 1,
+      duration: 0.35,
+      stagger: 0.05,
+      ease: 'power2.out',
+    }, '-=0.4');
+
+    // Labels fade in
+    tl.to(labels, {
+      opacity: 1,
+      duration: 0.6,
+      stagger: 0.06,
+      ease: 'power2.out',
+    }, '-=0.3');
+
+    return () => { tl.kill(); };
+  });
 </script>
 
-<section id="hero" class="relative overflow-hidden px-container">
+<svelte:window onscroll={handleScroll} />
+
+<section id="hero" class="hero-section relative overflow-hidden px-container">
   <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
     <div class="hero-blueprint-field">
       <div class="hero-blueprint-grid"></div>
       <div class="hero-blueprint-frame"></div>
-      <svg class="hero-blueprint-map" viewBox="0 0 900 560" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg bind:this={blueprintSvg} class="hero-blueprint-map" viewBox="0 0 900 560" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <marker id="arrowhead" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
             <polygon points="0 0, 6 2, 0 4" fill="rgba(0,80,47,0.40)" />
@@ -101,7 +182,7 @@
   </div>
 
   <div
-    class="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-y-6 pt-[clamp(52px,7vw,80px)] pb-[clamp(16px,2vw,28px)] lg:grid-cols-12 lg:gap-x-8 lg:gap-y-0"
+    class="hero-content relative z-10 mx-auto grid w-full max-w-7xl items-center gap-y-6 pt-[clamp(52px,7vw,80px)] lg:grid-cols-12 lg:gap-x-8 lg:gap-y-0"
   >
     <!-- Left column: narrative -->
     <div class="lg:col-span-7">
@@ -143,7 +224,7 @@
           class="button-primary lift-on-hover"
         >
           {t.hero.ctaPrimary}
-          <span aria-hidden="true">→</span>
+          <span class="hero-cta-arrow" aria-hidden="true">→</span>
         </a>
 
         <a
@@ -165,36 +246,67 @@
       </div>
     </div>
 
-    <!-- Right column: metrics command panel -->
+    <!-- Right column: metrics manifest panel -->
     <div
-      use:stagger={{ selector: '.hero-proof-stat', stagger: 0.08, y: 20, onComplete: () => { document.querySelector('.hero-proof-band')?.classList.add('is-revealed'); } }}
+      use:stagger={{ selector: '.hero-proof-stat', stagger: 0.08, y: 20 }}
       class="hero-proof-band lg:col-span-5 lg:row-start-1 lg:col-start-8"
+      role="region"
       aria-label="Indicadores de impacto"
     >
-      <div class="hero-status-row">
-        <span class="hero-status-dot" aria-hidden="true"></span>
-        <span class="hero-status-label">{t.hero.statusBadge}</span>
+      <div class="hero-proof-header">
+        <span class="hero-proof-header-title">{t.hero.statusBadge}</span>
+        <span class="hero-proof-header-ref" aria-hidden="true">REF: ELS-{new Date().getFullYear()}</span>
+        <span class="hero-proof-header-dot" aria-hidden="true"></span>
       </div>
 
       <div class="hero-proof-grid">
-        {#each t.hero.stats as stat}
+        {#each t.hero.stats as stat, i}
           {@const parsed = parseStatValue(stat.value)}
           <div class="hero-proof-stat">
-            <div class="hero-proof-label">{stat.label}</div>
-            <div
-              class="hero-proof-value"
-              use:countUp
-              data-value={parsed.numeric}
-              data-format="{parsed.prefix}{parsed.suffix}"
-            >
-              {stat.value}
+            <div class="hero-proof-field-head">
+              <span class="hero-proof-ref" aria-hidden="true">KPI-0{i + 1}</span>
+              <span class="hero-proof-label">{stat.label}</span>
+            </div>
+            <div class="hero-proof-value-row">
+              <svg class="hero-proof-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                {#if stat.direction === 'up'}
+                  <path d="M8 13V3M8 3l4 4M8 3L4 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                {:else}
+                  <path d="M8 3v10M8 13l4-4M8 13l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                {/if}
+              </svg>
+              <div
+                class="hero-proof-value"
+                use:countUp
+                data-value={parsed.numeric}
+                data-format="{parsed.prefix}{parsed.suffix}"
+              >
+                {stat.value}
+              </div>
             </div>
           </div>
         {/each}
       </div>
 
-      <p class="hero-proof-note">{t.hero.cardNote}</p>
+      <div class="hero-proof-footer">
+        <div class="hero-proof-barcode" aria-hidden="true">
+          {#each Array(12) as _, i}
+            <span class="hero-proof-bar" style:width="{i % 3 === 0 ? 3 : 1.5}px"></span>
+          {/each}
+        </div>
+        <p class="hero-proof-note">{t.hero.cardNote}</p>
+      </div>
     </div>
+  </div>
+
+  <div
+    class="scroll-prompt"
+    class:scroll-prompt-hidden={!scrollPromptVisible}
+    aria-hidden="true"
+  >
+    <svg width="20" height="10" viewBox="0 0 20 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 2l8 6 8-6"/>
+    </svg>
   </div>
 </section>
 
@@ -215,7 +327,7 @@
   .hero-kicker-rule {
     width: 2.4rem;
     height: 1.2px;
-    background: rgba(27, 107, 74, 0.36);
+    background: var(--color-brand-36);
   }
 
   .hero-kicker-sub {
@@ -257,20 +369,51 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--color-accent-deep);
-    border: 1px solid rgba(27, 107, 74, 0.14);
-    background: rgba(27, 107, 74, 0.03);
+    border: 1px solid var(--color-brand-14);
+    background: var(--color-brand-3);
     line-height: 1;
+  }
+
+  /* ── CTA arrow ── */
+  .hero-cta-arrow {
+    display: inline-block;
+    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  :global(.button-primary:hover) .hero-cta-arrow {
+    transform: translateX(4px);
+  }
+
+  :global(.button-primary:active) .hero-cta-arrow {
+    transform: translateX(2px);
   }
 
   /* ── Secondary link ── */
   .hero-secondary-link {
+    position: relative;
     color: var(--color-text-secondary);
     font-size: clamp(0.95rem, 0.94rem + 0.1vw, 1.04rem);
     text-decoration: none;
   }
 
+  .hero-secondary-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0;
+    height: 1.5px;
+    background: var(--color-accent-deep);
+    transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1), left 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
   .hero-secondary-link:hover {
     color: var(--color-text-primary);
+  }
+
+  .hero-secondary-link:hover::after {
+    width: 100%;
+    left: 0;
   }
 
   /* ── Blueprint SVG ── */
@@ -293,8 +436,8 @@
 
   .hero-blueprint-grid {
     background-image:
-      linear-gradient(rgba(27, 107, 74, 0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(27, 107, 74, 0.035) 1px, transparent 1px);
+      linear-gradient(rgba(var(--color-brand-rgb), 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(var(--color-brand-rgb), 0.035) 1px, transparent 1px);
     background-size: 36px 36px;
     mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.72) 66%, transparent 100%);
   }
@@ -303,7 +446,7 @@
   .hero-blueprint-frame::after {
     content: '';
     position: absolute;
-    background: rgba(27, 107, 74, 0.14);
+    background: var(--color-brand-14);
   }
 
   .hero-blueprint-frame::before {
@@ -326,20 +469,20 @@
   }
 
   .hero-blueprint-map .guide {
-    stroke: rgba(27, 107, 74, 0.16);
+    stroke: var(--color-brand-16);
     stroke-width: 1.4;
     stroke-dasharray: 5 10;
   }
 
   .hero-blueprint-map .route {
-    stroke: rgba(27, 107, 74, 0.42);
+    stroke: var(--color-brand-42);
     stroke-width: 2.2;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
 
   .hero-blueprint-map .lane {
-    stroke: rgba(61, 211, 132, 0.36);
+    stroke: var(--color-accent-36);
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -347,22 +490,22 @@
 
   .hero-blueprint-map .hub {
     fill: #fdfcf9;
-    stroke: rgba(27, 107, 74, 0.52);
+    stroke: var(--color-brand-52);
     stroke-width: 3.5;
   }
 
   .hero-blueprint-map .node {
-    fill: rgba(27, 107, 74, 0.48);
+    fill: var(--color-brand-48);
   }
 
   .hero-blueprint-map .slot {
-    fill: rgba(27, 107, 74, 0.05);
-    stroke: rgba(27, 107, 74, 0.22);
+    fill: var(--color-brand-5);
+    stroke: var(--color-brand-22);
     stroke-width: 1;
   }
 
   .hero-blueprint-map .tick {
-    stroke: rgba(27, 107, 74, 0.24);
+    stroke: rgba(var(--color-brand-rgb), 0.24);
     stroke-width: 1;
   }
 
@@ -370,114 +513,238 @@
     font-family: var(--font-sans);
     font-size: 9px;
     text-transform: uppercase;
-    fill: rgba(27, 107, 74, 0.30);
+    fill: rgba(var(--color-brand-rgb), 0.30);
     text-anchor: middle;
   }
 
-  /* ── Status badge ── */
-  .hero-status-row {
+  /* ── Hero section layout ── */
+  .hero-section {
+    min-height: 100svh;
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.55rem 1.2rem;
-    border-bottom: 1px solid rgba(27, 107, 74, 0.10);
+    flex-direction: column;
   }
 
-  .hero-status-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--color-accent);
-    animation: pulse 2s infinite;
+  .hero-content {
+    flex: 1;
   }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  .hero-status-label {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.20em;
-    text-transform: uppercase;
-    color: var(--color-accent);
-    line-height: 1;
-  }
-
-  /* ── Metrics panel ── */
+  /* ── Metrics manifest panel ── */
   .hero-proof-band {
-    background: color-mix(in srgb, var(--color-bg-primary) 96%, var(--color-accent-deep) 4%);
-    border: 1px solid rgba(27, 107, 74, 0.16);
-    border-left: 3px solid var(--color-accent);
+    background: var(--color-bg-card);
+    border: 1.5px solid var(--color-brand-22);
     position: relative;
-    overflow: hidden;
     align-self: center;
     z-index: 2;
   }
 
+  /* Corner crop marks — document registration */
+  .hero-proof-band::before,
   .hero-proof-band::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: -10%;
-    width: 40px;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
-    animation: scan-sweep 1.2s ease-out 0.3s forwards;
-    animation-play-state: paused;
+    width: 20px;
+    height: 20px;
     pointer-events: none;
+    z-index: 1;
   }
 
-  .hero-proof-band:global(.is-revealed)::after {
-    animation-play-state: running;
+  .hero-proof-band::before {
+    top: -6px;
+    left: -6px;
+    border-top: 2px solid var(--color-brand-36);
+    border-left: 2px solid var(--color-brand-36);
   }
 
-  @keyframes scan-sweep {
-    from { left: -10%; }
-    to { left: 110%; }
+  .hero-proof-band::after {
+    bottom: -6px;
+    right: -6px;
+    border-bottom: 2px solid var(--color-brand-36);
+    border-right: 2px solid var(--color-brand-36);
+  }
+
+  /* Dark teal header — like a real document header */
+  .hero-proof-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
+    background: var(--color-accent-deep);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .hero-proof-header-title {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .hero-proof-header-ref {
+    font-size: 0.56rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.45);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hero-proof-header-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    margin-left: auto;
+    position: relative;
+  }
+
+  .hero-proof-header-dot::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-accent);
+    animation: ping-ring 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  @keyframes ping-ring {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    70% { transform: scale(2.2); opacity: 0; }
+    100% { transform: scale(2.2); opacity: 0; }
   }
 
   .hero-proof-grid {
     display: grid;
     grid-template-columns: 1fr;
+    padding: 0;
   }
 
   .hero-proof-stat {
     position: relative;
-    padding: 0.85rem 1.2rem 0.8rem;
-    border-top: 2px solid rgba(61, 211, 132, 0.72);
+    padding: 0.75rem 1rem 0.8rem;
+    min-height: 5.4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-left: 3px solid transparent;
+    transition: border-color 0.2s;
   }
 
-  .hero-proof-stat:not(:first-child) {
-    border-top: 1px solid rgba(27, 107, 74, 0.10);
+  .hero-proof-stat:hover {
+    border-left-color: var(--color-accent);
+    background: var(--color-brand-3);
+  }
+
+  /* Dashed field separators — manifest style */
+  .hero-proof-stat:not(:first-child)::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    border-top: 1.5px dashed var(--color-brand-16);
+  }
+
+  .hero-proof-field-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .hero-proof-ref {
+    font-family: var(--font-sans);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #fff;
+    background: var(--color-accent-deep);
+    padding: 0.1rem 0.35rem;
+    border-radius: 2px;
+    line-height: 1.4;
   }
 
   .hero-proof-label {
-    margin-bottom: 0.35rem;
-    color: var(--color-accent-deep);
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
+    color: var(--color-text-secondary);
+    font-size: 0.64rem;
+    font-weight: 600;
+    letter-spacing: 0.10em;
     text-transform: uppercase;
-    max-width: 28ch;
     line-height: 1.3;
   }
 
-  .hero-proof-value {
+  .hero-proof-value-row {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .hero-proof-arrow {
+    width: 16px;
+    height: 16px;
     color: var(--color-accent-deep);
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  .hero-proof-value {
+    color: var(--color-text-primary);
     font-family: var(--font-sans);
     font-weight: 800;
-    font-size: clamp(1.5rem, 1.8vw, 2rem);
+    font-size: clamp(1.8rem, 2.4vw, 2.4rem);
     line-height: 1;
     letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hero-proof-footer {
+    border-top: 1.5px solid var(--color-brand-16);
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .hero-proof-barcode {
+    display: flex;
+    align-items: stretch;
+    gap: 2px;
+    height: 16px;
+    flex-shrink: 0;
+    opacity: 0.3;
+  }
+
+  .hero-proof-bar {
+    display: block;
+    background: var(--color-text-primary);
+    border-radius: 0.5px;
   }
 
   .hero-proof-note {
-    border-top: 1px solid rgba(27, 107, 74, 0.08);
-    padding: 0.65rem 1.2rem 0.7rem;
-    font-size: 0.78rem;
+    font-size: 0.66rem;
     color: var(--color-text-tertiary);
+    letter-spacing: 0.01em;
+  }
+
+  /* ── Scroll prompt ── */
+  .scroll-prompt {
+    display: flex;
+    justify-content: center;
+    padding-bottom: clamp(1.2rem, 2.5vh, 2.5rem);
+    color: var(--color-text-tertiary);
+    opacity: 0.6;
+    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    animation: scroll-bob 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    margin-top: auto;
+  }
+
+  .scroll-prompt-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @keyframes scroll-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(5px); }
   }
 
   /* ── Responsive ── */
@@ -491,6 +758,10 @@
   }
 
   @media (max-width: 768px) {
+    .hero-section {
+      min-height: auto;
+    }
+
     .hero-blueprint-field {
       top: 4.5rem;
       left: -5%;
@@ -504,33 +775,34 @@
       background-size: 32px 32px;
     }
 
-    .hero-proof-band {
-      border-left: 3px solid var(--color-accent);
-    }
-
     .hero-proof-stat {
-      padding: 0.85rem 1rem 0.8rem;
+      min-height: 4.6rem;
+      padding: 0.6rem 0.75rem 0.65rem;
     }
 
     .hero-proof-value {
-      font-size: clamp(1.4rem, 6vw, 1.75rem);
+      font-size: clamp(1.5rem, 6vw, 1.8rem);
     }
 
-    .hero-proof-note {
-      padding: 0.6rem 1rem 0.7rem;
-    }
-
-    .hero-status-row {
-      padding: 0.5rem 1rem;
+    .hero-proof-barcode {
+      display: none;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .hero-status-dot {
+    .hero-proof-header-dot::after {
       animation: none;
     }
 
-    .hero-proof-band::after {
+    .hero-cta-arrow {
+      transition: none;
+    }
+
+    .hero-secondary-link::after {
+      transition: none;
+    }
+
+    .scroll-prompt {
       animation: none;
     }
   }
