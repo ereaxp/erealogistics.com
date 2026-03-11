@@ -149,12 +149,13 @@ export function revealOnScroll(el: HTMLElement, opts?: { delay?: number; y?: num
 }
 
 /** Staggered children reveal */
-export function staggerReveal(parent: HTMLElement, childSelector: string, opts?: { stagger?: number; y?: number }) {
+export function staggerReveal(parent: HTMLElement, childSelector: string, opts?: { stagger?: number; y?: number; onComplete?: () => void }) {
   if (!parent) return null;
   const children = parent.querySelectorAll(childSelector);
 
   if (prefersReducedMotion()) {
     gsap.set(children, { opacity: 1, y: 0 });
+    opts?.onComplete?.();
     return gsap.getTweensOf(children)[0] ?? null;
   }
 
@@ -167,6 +168,7 @@ export function staggerReveal(parent: HTMLElement, childSelector: string, opts?:
       duration: DURATION.normal,
       stagger: opts?.stagger ?? STAGGER.loose,
       ease: REVEAL_EASES.body,
+      onComplete: opts?.onComplete,
       scrollTrigger: {
         trigger: parent,
         start: TRIGGER.early,
@@ -250,6 +252,50 @@ export function ambientParallax(el: HTMLElement, opts?: { speed?: number; direct
       }
     }
   );
+}
+
+/** Count-up animation for stat values on scroll */
+export function countUpOnScroll(el: HTMLElement) {
+  if (!el) return null;
+
+  const rawValue = el.getAttribute('data-value') ?? '0';
+  const format = el.getAttribute('data-format') ?? '';
+
+  // Parse numeric part
+  const numericStr = rawValue.replace(/[^0-9.]/g, '');
+  const targetVal = parseFloat(numericStr) || 0;
+
+  // Determine prefix/suffix from format
+  const prefix = format.startsWith('+') ? '+' : format.startsWith('-') ? '-' : '';
+  const suffix = format.replace(/^[+-]/, '');
+
+  if (prefersReducedMotion()) {
+    el.innerText = `${prefix}${rawValue}${suffix}`;
+    return null;
+  }
+
+  const obj = { val: 0 };
+
+  return gsap.to(obj, {
+    val: targetVal,
+    duration: DURATION.slow,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: el,
+      start: TRIGGER.early,
+      once: true,
+    },
+    onUpdate() {
+      const current = Math.round(obj.val);
+      // Format with commas for large numbers
+      const formatted = current >= 1000 ? current.toLocaleString('en-US') : String(current);
+      el.innerText = `${prefix}${formatted}${suffix}`;
+    },
+    onComplete() {
+      // Set final value exactly as intended
+      el.innerText = `${prefix}${rawValue}${suffix}`;
+    },
+  });
 }
 
 export { gsap, ScrollTrigger };

@@ -104,33 +104,41 @@
   style="background-color: {scrolled ? 'color-mix(in srgb, var(--color-bg-primary) 94%, white)' : 'transparent'}; border-bottom: {scrolled ? '1px solid var(--color-border-subtle)' : '1px solid transparent'};"
 >
   <div
-    class="absolute bottom-0 left-0 h-[2px] bg-[color:var(--color-accent)]"
+    class="absolute bottom-0 left-0 h-[2px] bg-accent"
     style="width: 100vw; transform: scaleX({scrollProgress / 100}); transform-origin: left;"
     aria-hidden="true"
   ></div>
 
-  <div class="mx-auto grid max-w-7xl grid-cols-[minmax(132px,1fr)_auto_minmax(132px,1fr)] items-center gap-3 py-2.5">
+  <div class="mx-auto grid max-w-7xl grid-cols-[minmax(132px,1fr)_auto_minmax(132px,1fr)] items-center gap-2 py-1.5">
     <a href="#hero" onclick={(e) => { e.preventDefault(); scrollToSection('hero'); }} class="flex items-center gap-3">
       <BrandMark />
     </a>
 
-    <div class="hidden items-center justify-center gap-5 lg:flex">
+    <div class="hidden items-center justify-center gap-3 lg:flex">
       {#each sections as section}
         <a
           href="#{section.id}"
           onclick={(e) => { e.preventDefault(); scrollTo(section.id); }}
           aria-current={section.id === activeSection ? 'true' : undefined}
-          class="text-label uppercase transition-colors duration-200 hover:text-text-primary {section.id === activeSection ? 'font-semibold text-[color:var(--color-accent-deep)]' : 'text-text-secondary'}"
+          class="nav-link text-label uppercase transition-colors duration-200 hover:text-text-primary {section.id === activeSection ? 'nav-link-active font-semibold text-accent-deep' : 'text-text-secondary'}"
         >
           {t.nav[section.key]}
         </a>
       {/each}
     </div>
 
-    <div class="flex items-center justify-end gap-0.5 sm:gap-1">
+    <div class="flex items-center justify-end gap-2 sm:gap-3">
+      <a
+        href="#contact"
+        onclick={(e) => { e.preventDefault(); scrollTo('contact'); }}
+        class="button-primary hidden px-3 py-1.5 text-sm lg:inline-flex"
+      >
+        {t.nav.cta}
+      </a>
+
       <button
         onclick={() => lang.toggle()}
-        class="px-2.5 py-2 text-label uppercase text-text-tertiary transition-colors duration-200 hover:text-text-primary hover:underline underline-offset-4"
+        class="nav-lang-toggle text-label uppercase text-text-tertiary transition-colors duration-200 hover:text-text-primary"
         aria-label={lang.current === 'es' ? 'Switch to English' : 'Cambiar a Español'}
       >
         {lang.current === 'es' ? 'EN' : 'ES'}
@@ -155,7 +163,7 @@
     <div
       bind:this={mobileMenuEl}
       id="mobile-menu"
-      class="bg-[color:var(--color-bg-primary)] lg:hidden"
+      class="bg-bg-primary lg:hidden"
       style="border-top: 1px solid var(--color-border-subtle); margin-left: calc(-1 * var(--spacing-container)); margin-right: calc(-1 * var(--spacing-container));"
     >
       <div class="mx-auto flex max-w-7xl flex-col gap-2 px-container py-4">
@@ -164,12 +172,42 @@
             href="#{section.id}"
             onclick={(e) => { e.preventDefault(); scrollTo(section.id); }}
             aria-current={section.id === activeSection ? 'true' : undefined}
-            class="py-3 text-label uppercase transition-colors duration-200 hover:text-text-primary {section.id === activeSection ? 'text-[color:var(--color-accent-deep)]' : 'text-text-secondary'}"
+            class="mobile-nav-link py-2.5 text-label uppercase transition-colors duration-200 hover:text-text-primary {section.id === activeSection ? 'mobile-nav-link-active text-accent-deep' : 'text-text-secondary'}"
           >
             {t.nav[section.key]}
           </a>
         {/each}
+
+        <a
+          href="#contact"
+          onclick={(e) => { e.preventDefault(); scrollTo('contact'); }}
+          class="button-primary mt-2 w-full px-4 py-3 text-center text-sm"
+        >
+          {t.nav.cta}
+        </a>
       </div>
     </div>
   {/if}
 </nav>
+
+<style>
+  .nav-link {
+    padding-bottom: 2px;
+    border-bottom: 2px solid transparent;
+  }
+
+  .nav-link-active {
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .nav-lang-toggle {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 3px;
+  }
+
+  .mobile-nav-link-active {
+    border-left: 2px solid var(--color-accent);
+    padding-left: 0.75rem;
+  }
+</style>

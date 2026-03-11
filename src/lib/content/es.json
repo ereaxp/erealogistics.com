@@ -17,12 +17,13 @@
     "cta": "Hablar con un Partner"
   },
   "hero": {
-    "kicker": "EREA CONSULTING GROUP",
+    "kicker": "EREA LOGISTICS SERVICES",
+    "kickerSub": "Una práctica de EREA Consulting Group",
     "title": "Transformamos Cadenas de Suministro en Ventajas Competitivas Medibles",
     "subtitle": "Diseñamos e implementamos soluciones que reducen costos estructurales, liberan capital de trabajo y elevan el nivel de servicio, integrando estrategia, tecnología y analytics avanzado.",
     "ctaPrimary": "Hablar con un Partner",
     "ctaSecondary": "Conocer Nuestra Metodología",
-    "note": "Enfoque institucional. Resultados medibles. Implementación con disciplina.",
+    "notePills": ["Enfoque institucional", "Resultados medibles", "Implementación con disciplina"],
     "stats": [
       {
         "label": "Valor incremental por negociación de fee logístico",
@@ -37,7 +38,8 @@
         "value": "-32%"
       }
     ],
-    "cardNote": "Resultados referenciales de proyectos ejecutados en LATAM."
+    "cardNote": "Resultados referenciales de proyectos ejecutados en LATAM.",
+    "statusBadge": "Operaciones Activas"
   },
   "about": {
     "label": "QUIÉNES SOMOS",
@@ -254,7 +256,7 @@
         "Roadmap ejecutable"
       ]
     },
-    "disclaimer": "Reemplace el correo “contacto@erea.com” por el oficial de EREA Logistics Services."
+    "disclaimer": "Reemplace el correo contacto@erea.com por el oficial de EREA Logistics Services."
   },
   "footer": {
     "tagline": "Transformamos Cadenas de Suministro",

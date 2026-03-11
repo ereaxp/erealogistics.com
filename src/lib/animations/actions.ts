@@ -18,6 +18,7 @@ import {
   staggerReveal,
   lineReveal as lineRevealFn,
   ambientParallax as ambientParallaxFn,
+  countUpOnScroll,
 } from './gsap';
 
 function destroyTween(tween: ReturnType<typeof revealOnScroll>) {
@@ -42,11 +43,17 @@ export const lineReveal: Action<HTMLElement> = (node) => {
 };
 
 /** Staggered children reveal on scroll. Requires `selector` to target child elements. */
-export const stagger: Action<HTMLElement, { selector: string; stagger?: number; y?: number }> = (
+export const stagger: Action<HTMLElement, { selector: string; stagger?: number; y?: number; onComplete?: () => void }> = (
   node,
   opts
 ) => {
-  const tween = staggerReveal(node, opts.selector, { stagger: opts.stagger, y: opts.y });
+  const tween = staggerReveal(node, opts.selector, { stagger: opts.stagger, y: opts.y, onComplete: opts.onComplete });
+  return { destroy: () => destroyTween(tween) };
+};
+
+/** Count-up animation for stat values on scroll. */
+export const countUp: Action<HTMLElement> = (node) => {
+  const tween = countUpOnScroll(node);
   return { destroy: () => destroyTween(tween) };
 };
 
