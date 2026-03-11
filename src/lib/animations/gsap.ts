@@ -66,9 +66,14 @@ export function getNavHeight(): number {
 }
 
 export function scrollToSection(id: string) {
+  const target = document.getElementById(id);
+  if (!target) {
+    if (import.meta.env.DEV) console.warn(`scrollToSection: "#${id}" not found`);
+    return;
+  }
   const l = getLenis();
   if (l) l.scrollTo(`#${id}`, { offset: -getNavHeight() });
-  else document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  else target.scrollIntoView({ behavior: 'smooth' });
 }
 
 export function refreshScrollTrigger() {

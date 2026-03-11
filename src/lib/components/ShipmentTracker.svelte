@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import { gsap, ScrollTrigger, prefersReducedMotion } from '$lib/animations/gsap';
-  import { scrollToSection } from '$lib/animations/gsap';
+  import { ScrollTrigger, scrollToSection } from '$lib/animations/gsap';
 
   const sections = [
     { id: 'about', label: 'About', num: '01' },
@@ -48,7 +47,10 @@
     // Track active section
     sections.forEach((section, i) => {
       const el = document.getElementById(section.id);
-      if (!el) return;
+      if (!el) {
+        if (import.meta.env.DEV) console.warn(`ShipmentTracker: section "#${section.id}" not found`);
+        return;
+      }
       triggers.push(
         ScrollTrigger.create({
           trigger: el,
@@ -224,7 +226,8 @@
     transition: opacity 0.2s ease, transform 0.2s ease;
   }
 
-  .tracker-stop:hover .tracker-label {
+  .tracker-stop:hover .tracker-label,
+  .tracker-stop:focus-within .tracker-label {
     opacity: 1;
     transform: translateX(0);
   }

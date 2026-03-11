@@ -10,7 +10,7 @@
   let scrollPromptVisible = $state(true);
 
   function handleScroll() {
-    if (window.scrollY > 80) {
+    if (scrollPromptVisible && window.scrollY > 80) {
       scrollPromptVisible = false;
     }
   }
@@ -656,7 +656,7 @@
     font-size: 0.58rem;
     font-weight: 700;
     letter-spacing: 0.06em;
-    color: #fff;
+    color: var(--color-bg-card);
     background: var(--color-accent-deep);
     padding: 0.1rem 0.35rem;
     border-radius: 2px;

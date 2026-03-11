@@ -21,7 +21,7 @@
 <Nav bind:mobileOpen />
 <ShipmentTracker />
 
-<main inert={mobileOpen || undefined}>
+<main id="main" inert={mobileOpen || undefined}>
   <Hero />
 
   <section id="about" class="px-container py-section">
