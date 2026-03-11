@@ -7,7 +7,6 @@
 
   let t = $derived(getContent());
   let scrolled = $state(false);
-  let scrollProgress = $state(0);
   let activeSection = $state('');
 
   const sections = [
@@ -18,17 +17,9 @@
     { id: 'contact', key: 'contact' as const }
   ];
 
-  let scrollRafPending = false;
-
   function handleScroll() {
-    if (scrollRafPending) return;
-    scrollRafPending = true;
-    requestAnimationFrame(() => {
-      scrolled = window.scrollY > 24;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      scrollProgress = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
-      scrollRafPending = false;
-    });
+    const next = window.scrollY > 24;
+    if (next !== scrolled) scrolled = next;
   }
 
   function scrollTo(id: string) {
@@ -103,12 +94,6 @@
   class:backdrop-blur-sm={scrolled}
   style="background-color: {scrolled ? 'color-mix(in srgb, var(--color-bg-primary) 94%, white)' : 'transparent'}; border-bottom: {scrolled ? '1px solid var(--color-border-subtle)' : '1px solid transparent'};"
 >
-  <div
-    class="absolute bottom-0 left-0 h-[2px] bg-accent"
-    style="width: 100vw; transform: scaleX({scrollProgress / 100}); transform-origin: left;"
-    aria-hidden="true"
-  ></div>
-
   <div class="mx-auto grid max-w-7xl grid-cols-[minmax(132px,1fr)_auto_minmax(132px,1fr)] items-center gap-2 py-1.5">
     <a href="#hero" onclick={(e) => { e.preventDefault(); scrollToSection('hero'); }} class="flex items-center gap-3">
       <BrandMark />
@@ -120,7 +105,7 @@
           href="#{section.id}"
           onclick={(e) => { e.preventDefault(); scrollTo(section.id); }}
           aria-current={section.id === activeSection ? 'true' : undefined}
-          class="nav-link text-label uppercase transition-colors duration-200 hover:text-text-primary {section.id === activeSection ? 'nav-link-active font-semibold text-accent-deep' : 'text-text-secondary'}"
+          class="nav-link text-label uppercase transition-colors duration-200 hover:text-text-primary {section.id === activeSection ? 'font-semibold text-accent-deep' : 'text-text-secondary'}"
         >
           {t.nav[section.key]}
         </a>
@@ -188,32 +173,6 @@
 </nav>
 
 <style>
-  .nav-link {
-    position: relative;
-    padding-bottom: 4px;
-  }
-
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 2px;
-    background: var(--color-accent);
-    transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1), left 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-  }
-
-  .nav-link:hover::after {
-    width: 100%;
-    left: 0;
-  }
-
-  .nav-link-active::after {
-    width: 100%;
-    left: 0;
-  }
-
   .nav-lang-toggle {
     padding: 0.25rem 0.5rem;
     border: none;
@@ -252,10 +211,6 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .nav-link::after {
-      transition: none;
-    }
-
     .mobile-menu {
       transition: none;
     }

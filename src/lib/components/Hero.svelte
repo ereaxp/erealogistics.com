@@ -22,7 +22,6 @@
     return { numeric: match[2], prefix: match[1], suffix: match[3] };
   }
 
-
   onMount(() => {
     if (!blueprintSvg || prefersReducedMotion()) return;
 
@@ -357,13 +356,6 @@
   >
     <!-- Left column: narrative -->
     <div class="flex flex-col lg:col-span-7">
-      <div use:reveal class="hero-doc-ref-strip mb-6" data-reveal aria-hidden="true">
-        <span class="hero-doc-ref-id">EREA / LOGISTICS</span>
-        <span class="hero-doc-ref-dash">—</span>
-        <span class="hero-doc-ref-class">PRACTICE BRIEF</span>
-        <span class="hero-doc-ref-date">{currentYear}</span>
-      </div>
-
       <div use:reveal class="hero-kicker-block mb-5" data-reveal>
         <div class="hero-kicker-row">
           <span class="hero-kicker-rule" aria-hidden="true"></span>
@@ -433,7 +425,7 @@
     <!-- Right column: metrics manifest panel -->
     <div
       use:stagger={{ selector: '.hero-proof-stat', stagger: 0.08, y: 20 }}
-      class="hero-proof-band lg:col-span-5 lg:row-start-1 lg:col-start-8 lg:self-start lg:mt-4"
+      class="hero-proof-band lg:col-span-5 lg:row-start-1 lg:col-start-8 lg:self-start"
       role="region"
       aria-label="Indicadores de impacto"
     >
@@ -568,10 +560,10 @@
 
   .hero-manifest-strip-label {
     font-family: var(--font-sans);
-    font-size: 0.62rem;
+    font-size: 0.56rem;
     font-weight: 700;
-    letter-spacing: 0.14em;
-    color: var(--color-brand-28);
+    letter-spacing: 0.18em;
+    color: var(--color-brand-22);
     text-transform: uppercase;
     flex-shrink: 0;
     padding-right: 0.6rem;
@@ -596,6 +588,7 @@
     color: var(--color-text-secondary);
     border-right: 1px solid var(--color-brand-10);
     line-height: 1;
+    white-space: nowrap;
   }
 
   .hero-manifest-strip-item:last-child {
@@ -622,7 +615,7 @@
     color: var(--color-bg-card);
     background: var(--color-accent-deep);
     border: none;
-    border-left: 3.5px solid var(--color-accent);
+    border-left: 2.5px solid rgba(255, 255, 255, 0.18);
     text-decoration: none;
     transition: background-color 0.2s ease, border-color 0.2s ease;
   }
@@ -636,14 +629,14 @@
     font-size: 0.52rem;
     font-weight: 700;
     letter-spacing: 0.1em;
-    color: var(--color-accent);
-    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.04);
     align-self: stretch;
   }
 
   .hero-cta-primary:hover {
     background: var(--color-gradient-deep);
-    border-left-color: var(--color-accent-soft);
+    border-left-color: rgba(255, 255, 255, 0.28);
   }
 
   .hero-cta-primary:active {
@@ -883,46 +876,6 @@
     color: var(--color-brand-22);
   }
 
-  /* ── Document reference strip ── */
-  .hero-doc-ref-strip {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-
-  .hero-doc-ref-id {
-    font-family: var(--font-sans);
-    font-size: 0.56rem;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    color: var(--color-brand-36);
-    text-transform: uppercase;
-  }
-
-  .hero-doc-ref-dash {
-    font-size: 0.56rem;
-    color: var(--color-brand-16);
-  }
-
-  .hero-doc-ref-class {
-    font-family: var(--font-sans);
-    font-size: 0.56rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    color: var(--color-brand-28);
-    text-transform: uppercase;
-  }
-
-  .hero-doc-ref-date {
-    font-family: var(--font-sans);
-    font-size: 0.56rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    color: var(--color-brand-22);
-    margin-left: auto;
-    font-variant-numeric: tabular-nums;
-  }
-
   /* ── Hero section layout ── */
   .hero-section {
     min-height: 100svh;
@@ -1000,12 +953,12 @@
 
   .hero-proof-header-class {
     margin-left: auto;
-    font-size: 0.5rem;
+    font-size: 0.48rem;
     font-weight: 700;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--color-accent-deep);
-    border: 1px solid var(--color-brand-28);
+    color: var(--color-brand-36);
+    border: 1px solid var(--color-brand-16);
     padding: 0.1rem 0.4rem;
     line-height: 1.3;
   }
@@ -1223,10 +1176,7 @@
     .hero-manifest-strip-item {
       border-right: none;
       padding: 0.15rem 0.4rem;
-    }
-
-    .hero-doc-ref-date {
-      margin-left: 0;
+      max-width: 100%;
     }
 
     .hero-blueprint-field {
