@@ -216,8 +216,7 @@
 
   .nav-lang-toggle {
     padding: 0.25rem 0.5rem;
-    border: 1px solid var(--color-border-subtle);
-    border-radius: 3px;
+    border: none;
   }
 
   .mobile-nav-link-active {

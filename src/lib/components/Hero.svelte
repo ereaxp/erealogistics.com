@@ -770,7 +770,7 @@
   .hero-blueprint-map .hub {
     fill: #fdfcf9;
     stroke: var(--color-brand-52);
-    stroke-width: 3.5;
+    stroke-width: 1.5;
   }
 
   .hero-blueprint-map .node {
