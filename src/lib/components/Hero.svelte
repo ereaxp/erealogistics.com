@@ -37,6 +37,8 @@
     const refNumbers = blueprintSvg.querySelectorAll('.ref-number');
     const manifestRows = blueprintSvg.querySelectorAll('.manifest-rows');
     const handlingMark = blueprintSvg.querySelectorAll('.handling-mark');
+    const shipmentDotsGroup = blueprintSvg.querySelector('.shipment-dots');
+    const shipmentDots = blueprintSvg.querySelectorAll('.shipment-dot');
 
     const setDashHidden = (el: Element) => {
       const length = (el as SVGPathElement).getTotalLength();
@@ -50,6 +52,7 @@
     gsap.set([hubsOrigin, hubCentral, hubsDestination, nodes], { scale: 0, transformOrigin: 'center center' });
     gsap.set(labels, { opacity: 0, y: 4 });
     gsap.set([locationCodes, refNumbers, manifestRows, handlingMark], { opacity: 0 });
+    gsap.set(shipmentDotsGroup, { opacity: 0 });
 
     const tl = gsap.timeline({ delay: 0.5 });
 
@@ -133,7 +136,164 @@
       ease: 'power2.out',
     }, '-=0.15');
 
-    return () => { tl.kill(); };
+    // Phase 5: Shipment dots fade in, then begin lifecycle loops
+    tl.to(shipmentDotsGroup, {
+      opacity: 1,
+      duration: 0.6,
+      ease: 'power2.out',
+      onComplete: startShipmentLoops,
+    }, '-=0.2');
+
+    const shipmentTimelines: gsap.core.Timeline[] = [];
+
+    function getPath(id: string): SVGPathElement {
+      return blueprintSvg.querySelector(`#${id}`) as SVGPathElement;
+    }
+
+    // Step types for the unified shipment runner
+    type MoveStep = { type: 'move'; pathEl: SVGPathElement; len: number; speed: number };
+    type DwellStep = { type: 'dwell'; dur: number };
+    type ModeStep = { type: 'mode'; toClass: string; fromClass: string; toRadius: number };
+    type ShipmentStep = MoveStep | DwellStep | ModeStep;
+
+    /**
+     * Build a single GSAP timeline for one shipment dot.
+     * Instead of chaining many tweens on proxy objects (which breaks on repeat),
+     * each move segment gets its own gsap.to that directly drives cx/cy via
+     * getPointAtLength. Dwells and mode changes are interleaved sequentially.
+     */
+    function buildShipmentTimeline(
+      dot: Element,
+      steps: ShipmentStep[],
+      opts: { delay?: number; resetClass?: string; resetRadius?: number },
+    ): gsap.core.Timeline {
+      const loop = gsap.timeline({ repeat: -1, delay: opts.delay ?? 0, paused: true });
+
+      // Position dot at start of first move segment
+      for (const step of steps) {
+        if (step.type === 'move') {
+          const startPt = step.pathEl.getPointAtLength(0);
+          dot.setAttribute('cx', String(startPt.x));
+          dot.setAttribute('cy', String(startPt.y));
+          break;
+        }
+      }
+
+      for (const step of steps) {
+        if (step.type === 'move') {
+          const dur = step.len / step.speed;
+          const pathEl = step.pathEl;
+          const len = step.len;
+          // Use an empty-target tween and read this.progress() each frame.
+          // No proxy objects — progress is always 0→1 regardless of repeat.
+          loop.to({}, {
+            duration: dur,
+            ease: 'none',
+            onUpdate() {
+              const pt = pathEl.getPointAtLength(this.progress() * len);
+              dot.setAttribute('cx', String(pt.x));
+              dot.setAttribute('cy', String(pt.y));
+            },
+          });
+        } else if (step.type === 'dwell') {
+          loop.to({}, { duration: step.dur });
+        } else if (step.type === 'mode') {
+          loop.to(dot, { attr: { r: 0 }, duration: 0.25, ease: 'power2.in' });
+          const { fromClass, toClass, toRadius } = step;
+          loop.call(() => { dot.classList.remove(fromClass); dot.classList.add(toClass); });
+          loop.to(dot, { attr: { r: toRadius }, duration: 0.3, ease: 'back.out(1.6)' });
+        }
+      }
+
+      // End-of-loop reset: shrink, reposition, restore class, grow back
+      if (opts.resetClass && opts.resetRadius) {
+        loop.to(dot, { attr: { r: 0 }, duration: 0.2, ease: 'power2.in' });
+        const firstMove = steps.find((s): s is MoveStep => s.type === 'move')!;
+        const startPt = firstMove.pathEl.getPointAtLength(0);
+        const { resetClass, resetRadius } = opts;
+        loop.call(() => {
+          // Remove any mode class, restore reset class
+          dot.classList.remove('shipment-truck', 'shipment-container', 'shipment-van');
+          dot.classList.add(resetClass);
+          dot.setAttribute('cx', String(startPt.x));
+          dot.setAttribute('cy', String(startPt.y));
+        });
+        loop.to(dot, { attr: { r: opts.resetRadius }, duration: 0.25, ease: 'power2.out' });
+      }
+
+      return loop;
+    }
+
+    function move(id: string, speed: number): MoveStep {
+      const pathEl = getPath(id);
+      return { type: 'move', pathEl, len: pathEl.getTotalLength(), speed };
+    }
+    function dwell(dur: number): DwellStep { return { type: 'dwell', dur }; }
+    function mode(toClass: string, fromClass: string, toRadius: number): ModeStep {
+      return { type: 'mode', toClass, fromClass, toRadius };
+    }
+
+    function startShipmentLoops() {
+      const dots = Array.from(shipmentDots);
+      const TRUCK = 75;
+      const CONTAINER = 55;
+      const FACILITY = 130;
+      const VAN = 95;
+      const XDOCK_DWELL = 0.2;
+
+      // ── Shipment A: GYE → CTG → MIA (truck→container) → xdock → VCP → SCL ──
+      const loopA = buildShipmentTimeline(dots[0], [
+        move('seg-a1', TRUCK),
+        dwell(0.8),
+        move('seg-a2', TRUCK),
+        dwell(0.4),
+        mode('shipment-container', 'shipment-truck', 4.5),
+        dwell(1.0),
+        move('seg-a-xfer', FACILITY),
+        dwell(XDOCK_DWELL),
+        move('seg-a3', CONTAINER),
+        dwell(0.5),
+        move('seg-a4', CONTAINER),
+        dwell(0.3),
+        move('seg-a5', CONTAINER),
+        dwell(0.6),
+      ], { resetClass: 'shipment-truck', resetRadius: 3.5 });
+      shipmentTimelines.push(loopA);
+      loopA.play();
+
+      // ── Shipment B: MDE → PTY → MIA (truck→container) → xdock → GIG → EZE ──
+      const loopB = buildShipmentTimeline(dots[1], [
+        move('seg-b1', TRUCK),
+        dwell(1.0),
+        move('seg-b2', TRUCK),
+        dwell(0.4),
+        mode('shipment-container', 'shipment-truck', 4.5),
+        dwell(1.2),
+        move('seg-b-xfer', FACILITY),
+        dwell(XDOCK_DWELL),
+        move('seg-b3', CONTAINER),
+        dwell(0.8),
+        move('seg-b4', CONTAINER),
+        dwell(0.3),
+        move('seg-b5', CONTAINER),
+        dwell(0.7),
+      ], { delay: 4, resetClass: 'shipment-truck', resetRadius: 3.5 });
+      shipmentTimelines.push(loopB);
+      loopB.play();
+
+      // ── Shipment C: van last-mile, branch → LIM ──
+      const loopC = buildShipmentTimeline(dots[2], [
+        move('seg-v1', VAN),
+        dwell(0.4),
+      ], { delay: 8, resetClass: 'shipment-van', resetRadius: 2.5 });
+      shipmentTimelines.push(loopC);
+      loopC.play();
+    }
+
+    return () => {
+      tl.kill();
+      shipmentTimelines.forEach(t => t.kill());
+    };
   });
 </script>
 
@@ -192,6 +352,7 @@
         <path class="lane" d="M320 340H380V390" />
         <path class="lane" d="M220 460H280V500" />
         <path class="lane" d="M220 460H160V500" />
+        <path class="lane" d="M220 460V500" />
         <path class="lane" d="M130 740H70V780" />
         <path class="lane" d="M310 760H370V800" />
         <path class="lane" d="M60 880H60V920H100" />
@@ -233,11 +394,12 @@
         <!-- Distribution hubs -->
         <text class="hub-label" x="130" y="588">DECON</text>
         <text class="hub-label" x="310" y="648">DIST</text>
+        <text class="hub-label" x="130" y="728">DEPOT</text>
         <!-- Bottom destinations -->
         <text class="hub-label" x="60" y="868">RETAIL</text>
-        <text class="hub-label" x="160" y="888">DC-SUR</text>
+        <text class="hub-label" x="160" y="888">DC-NORTE</text>
         <text class="hub-label" x="220" y="848">PORT</text>
-        <text class="hub-label" x="300" y="888">DC-NORTE</text>
+        <text class="hub-label" x="300" y="888">DC-SUR</text>
         <text class="hub-label" x="380" y="868">E-COMM</text>
 
         <!-- ═══ HUB CIRCLES ═══ -->
@@ -251,6 +413,7 @@
         <circle class="hub hub-origin" cx="140" cy="270" r="10" />
         <circle class="hub hub-origin" cx="320" cy="340" r="10" />
         <!-- Waist — consolidation + cross-dock (y:460, 500) -->
+        <circle class="hub-pulse" cx="220" cy="460" r="13" />
         <circle class="hub hub-central" cx="220" cy="460" r="13" />
         <circle class="hub hub-central" cx="220" cy="500" r="10" />
         <!-- Distribution hubs (y:600, 660) -->
@@ -270,7 +433,7 @@
         <circle class="node" cx="380" cy="390" r="4" />
         <circle class="node" cx="280" cy="500" r="4" />
         <circle class="node" cx="160" cy="500" r="4" />
-        <circle class="node" cx="130" cy="740" r="4" />
+        <circle class="hub hub-destination" cx="130" cy="740" r="7" />
         <circle class="node" cx="310" cy="760" r="4" />
         <circle class="node" cx="70" cy="780" r="4" />
         <circle class="node" cx="370" cy="800" r="4" />
@@ -326,7 +489,7 @@
         <text class="ref-number" x="340" y="240">MSCU4821903</text>
         <text class="ref-number" x="42" y="410">LCL &gt; FCL</text>
         <text class="ref-number" x="320" y="550">FOB CTG</text>
-        <text class="ref-number" x="42" y="720">DDP MEX</text>
+        <text class="ref-number" x="42" y="720">DDP SCL</text>
         <text class="ref-number" x="340" y="850">40HC</text>
 
         <!-- ═══ MANIFEST TABLE ═══ -->
@@ -340,6 +503,40 @@
           <!-- Column dividers -->
           <line x1="80" y1="548" x2="80" y2="592" stroke-dasharray="2 2" />
           <line x1="118" y1="548" x2="118" y2="592" stroke-dasharray="2 2" />
+        </g>
+
+        <!-- ═══ SHIPMENT ROUTE SEGMENTS (hidden, used by MotionPathPlugin) ═══ -->
+        <g class="shipment-paths" visibility="hidden">
+          <!-- Shipment A inbound: GYE → CTG → MIA -->
+          <path id="seg-a1" d="M55,80 V270 H140" />
+          <path id="seg-a2" d="M140,270 V460 H220" />
+          <!-- Consol → xdock transfer -->
+          <path id="seg-a-xfer" d="M220,460 V500" />
+          <!-- Shipment A outbound: xdock → VCP → node → SCL -->
+          <path id="seg-a3" d="M220,500 V600 H130" />
+          <path id="seg-a4" d="M130,600 V740" />
+          <path id="seg-a5" d="M130,740 H60 V880" />
+          <!-- Shipment B inbound: MDE → PTY → MIA -->
+          <path id="seg-b1" d="M310,70 V210 H320 V340" />
+          <path id="seg-b2" d="M320,340 H220 V460" />
+          <!-- Consol → xdock transfer -->
+          <path id="seg-b-xfer" d="M220,460 V500" />
+          <!-- Shipment B outbound: xdock → GIG → node → EZE -->
+          <path id="seg-b3" d="M220,500 V580 H310 V660" />
+          <path id="seg-b4" d="M310,660 V760" />
+          <path id="seg-b5" d="M310,760 H300 V900" />
+          <!-- Van last-mile: branch → LIM -->
+          <path id="seg-v1" d="M130,740 V760 H160 V900" />
+        </g>
+
+        <!-- ═══ SHIPMENT DOTS — lifecycle dots that change mode at hub ═══ -->
+        <g class="shipment-dots">
+          <!-- Shipment A: starts as truck, becomes container after consolidation -->
+          <circle class="shipment-dot shipment-truck" r="3.5" />
+          <!-- Shipment B: starts as truck, becomes container after consolidation -->
+          <circle class="shipment-dot shipment-truck" r="3.5" />
+          <!-- Van: last-mile, spawns from branch node -->
+          <circle class="shipment-dot shipment-van" r="2.5" />
         </g>
 
         <!-- ═══ HANDLING MARK — this side up ═══ -->
@@ -764,6 +961,46 @@
     fill: #fdfcf9;
     stroke: var(--color-brand-52);
     stroke-width: 1.5;
+  }
+
+  .hero-blueprint-map .hub-pulse {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 1.5;
+    opacity: 0;
+    transform-origin: 220px 460px;
+    animation: hub-pulse 3s cubic-bezier(0.25, 0, 0.5, 1) infinite;
+  }
+
+  @keyframes hub-pulse {
+    0% {
+      opacity: 0.5;
+      r: 13;
+    }
+    70% {
+      opacity: 0;
+      r: 28;
+    }
+    100% {
+      opacity: 0;
+      r: 28;
+    }
+  }
+
+  .hero-blueprint-map .shipment-dot {
+    opacity: 0.6;
+  }
+
+  .hero-blueprint-map :global(.shipment-container) {
+    fill: var(--color-accent-deep);
+  }
+
+  .hero-blueprint-map .shipment-truck {
+    fill: var(--color-accent);
+  }
+
+  .hero-blueprint-map .shipment-van {
+    fill: var(--color-brand-48);
   }
 
   .hero-blueprint-map .node {
@@ -1223,6 +1460,15 @@
 
     .scroll-prompt {
       animation: none;
+    }
+
+    .hero-blueprint-map .hub-pulse {
+      animation: none;
+      opacity: 0;
+    }
+
+    .hero-blueprint-map .shipment-dots {
+      display: none;
     }
   }
 </style>
