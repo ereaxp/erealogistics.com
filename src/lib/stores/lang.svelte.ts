@@ -3,7 +3,7 @@ import { replaceState } from '$app/navigation';
 import en from '$lib/content/en.json';
 import es from '$lib/content/es.json';
 import type { Content } from '$lib/content/types';
-import { refreshScrollTrigger, snapPassedAnimations, prefersReducedMotion, getLenis, getNavHeight } from '$lib/animations/gsap';
+import { refreshScrollTrigger, snapPassedAnimations, prefersReducedMotion, getNavHeight } from '$lib/animations/gsap';
 
 export type Lang = 'es' | 'en';
 
@@ -30,12 +30,7 @@ function correctDrift(anchor: { el: HTMLElement; offsetTop: number } | null) {
   if (!anchor) return;
   const shift = anchor.el.offsetTop - anchor.offsetTop;
   if (Math.abs(shift) < 2) return; // ignore sub-pixel rounding
-  const target = window.scrollY + shift;
   window.scrollBy(0, shift);
-  // Sync Lenis internal state — use pre-computed target to avoid
-  // any timing ambiguity with scrollBy inside view transitions
-  const lenis = getLenis();
-  if (lenis) lenis.scrollTo(target, { immediate: true });
 }
 
 const contents: Record<Lang, Content> = { en, es };

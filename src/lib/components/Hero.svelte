@@ -23,7 +23,7 @@
 
 
   onMount(() => {
-    if (!blueprintSvg) return;
+    if (!blueprintSvg || prefersReducedMotion()) return;
 
     const routesIn = blueprintSvg.querySelectorAll('.route-in');
     const routesOut = blueprintSvg.querySelectorAll('.route-out');
@@ -705,6 +705,7 @@
     opacity: 1;
     mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.3) 18%, rgba(0, 0, 0, 0.65) 38%, rgba(0, 0, 0, 0.65) 62%, rgba(0, 0, 0, 0.3) 82%, transparent 100%),
       linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 8%, rgba(0, 0, 0, 0.85) 25%, rgba(0, 0, 0, 0.85) 75%, rgba(0, 0, 0, 0.5) 92%, transparent 100%);
+    -webkit-mask-composite: source-in;
     mask-composite: intersect;
   }
 
@@ -1199,7 +1200,8 @@
       opacity: 0.6;
       mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.25) 15%, rgba(0, 0, 0, 0.55) 35%, rgba(0, 0, 0, 0.55) 65%, rgba(0, 0, 0, 0.25) 85%, transparent 100%),
         linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 10%, rgba(0, 0, 0, 0.8) 28%, rgba(0, 0, 0, 0.8) 72%, rgba(0, 0, 0, 0.5) 90%, transparent 100%);
-      mask-composite: intersect;
+      -webkit-mask-composite: source-in;
+    mask-composite: intersect;
     }
   }
 
@@ -1237,7 +1239,8 @@
       opacity: 0.25;
       mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.3) 20%, rgba(0, 0, 0, 0.5) 40%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0.3) 80%, transparent 100%),
         linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 15%, rgba(0, 0, 0, 0.7) 30%, rgba(0, 0, 0, 0.7) 70%, rgba(0, 0, 0, 0.5) 85%, transparent 100%);
-      mask-composite: intersect;
+      -webkit-mask-composite: source-in;
+    mask-composite: intersect;
     }
 
     .hero-blueprint-grid {
