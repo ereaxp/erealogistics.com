@@ -7,14 +7,7 @@
 
   let t = $derived(getContent());
   let blueprintSvg: SVGSVGElement;
-  let scrollPromptVisible = $state(true);
   const currentYear = new Date().getFullYear();
-
-  function handleScroll() {
-    if (scrollPromptVisible && window.scrollY > 80) {
-      scrollPromptVisible = false;
-    }
-  }
 
   function parseStatValue(value: string): { numeric: string; prefix: string; suffix: string } {
     const match = value.match(/^([+-]?)(\d[\d,.]*)(.*)$/);
@@ -290,14 +283,49 @@
       loopC.play();
     }
 
+    // ── Route pulse — supply chain metaphor across UI elements ──
+    // Sequential green glow traces the Z-pattern: kicker → CTA → card header → KPI badges
+    const heroEl = blueprintSvg.closest('.hero-section');
+    if (heroEl) {
+      const kickerRule = heroEl.querySelector('.hero-kicker-rule');
+      const ctaBtn = heroEl.querySelector('.hero-cta-primary');
+      const proofHeader = heroEl.querySelector('.hero-proof-header');
+      const kpiBadges = heroEl.querySelectorAll('.hero-proof-ref');
+
+      const pulse = gsap.timeline({ delay: 2.8 });
+
+      const glowIn = { boxShadow: '0 0 18px 5px rgba(61, 211, 132, 0.6)' };
+      const glowOut = { boxShadow: '0 0 0 0 rgba(61, 211, 132, 0)' };
+      const dur = 0.35;
+      const ease = 'power2.out';
+
+      // Z-pattern: kicker (top-left) → card header (top-right) → KPI badges (down-right) → CTA (bottom-left)
+      if (kickerRule) {
+        pulse.to(kickerRule, { ...glowIn, duration: dur, ease });
+        pulse.to(kickerRule, { ...glowOut, duration: 0.5, ease: 'power2.in' }, '+=0.05');
+      }
+      if (proofHeader) {
+        pulse.to(proofHeader, { boxShadow: '0 -2px 14px 3px rgba(61, 211, 132, 0.45)', duration: dur, ease }, '-=0.3');
+        pulse.to(proofHeader, { ...glowOut, duration: 0.5, ease: 'power2.in' }, '+=0.05');
+      }
+      kpiBadges.forEach((badge, i) => {
+        pulse.to(badge, { boxShadow: '0 0 12px 3px rgba(61, 211, 132, 0.55)', duration: 0.3, ease }, i === 0 ? '-=0.3' : '-=0.2');
+        pulse.to(badge, { ...glowOut, duration: 0.4, ease: 'power2.in' }, '+=0.02');
+      });
+      if (ctaBtn) {
+        pulse.call(() => { (ctaBtn as HTMLElement).style.transition = 'none'; });
+        pulse.to(ctaBtn, { boxShadow: '0 0 22px 6px rgba(61, 211, 132, 0.45)', duration: 0.6, ease: 'power2.out' }, '-=0.2');
+        pulse.to(ctaBtn, { boxShadow: '0 2px 8px rgba(45, 143, 106, 0.2)', duration: 0.8, ease: 'power1.inOut' });
+        pulse.call(() => { (ctaBtn as HTMLElement).style.transition = ''; });
+      }
+    }
+
     return () => {
       tl.kill();
       shipmentTimelines.forEach(t => t.kill());
     };
   });
 </script>
-
-<svelte:window onscroll={handleScroll} />
 
 <section id="hero" class="hero-section relative overflow-hidden px-container">
   <!-- Document margin signals -->
@@ -312,7 +340,7 @@
     <div class="hero-blueprint-field">
       <div class="hero-blueprint-grid"></div>
       <div class="hero-blueprint-frame"></div>
-      <svg bind:this={blueprintSvg} class="hero-blueprint-map" viewBox="0 0 440 960" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg bind:this={blueprintSvg} class="hero-blueprint-map" viewBox="0 0 700 960" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <marker id="arrowhead" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
             <polygon points="0 0, 6 2, 0 4" fill="rgba(0,80,47,0.40)" />
@@ -324,9 +352,11 @@
         <path class="guide" d="M70 30V930" />
         <path class="guide" d="M220 30V930" />
         <path class="guide" d="M370 30V930" />
+        <path class="guide" d="M500 30V400" />
+        <path class="guide" d="M630 30V300" />
         <!-- Horizontal guides — mark the five topology zones -->
-        <path class="guide" d="M40 120H400" />
-        <path class="guide" d="M40 320H400" />
+        <path class="guide" d="M40 120H660" />
+        <path class="guide" d="M40 320H520" />
         <path class="guide" d="M40 460H400" />
         <path class="guide" d="M40 620H400" />
         <path class="guide" d="M40 800H400" />
@@ -337,6 +367,8 @@
         <path class="route route-in" d="M220 100V460" marker-end="url(#arrowhead)" />
         <path class="route route-in" d="M310 70V210H320V340H220V460" marker-end="url(#arrowhead)" />
         <path class="route route-in" d="M390 110V220H320V340" marker-end="url(#arrowhead)" />
+        <path class="route route-in" d="M660 50V130H540V200H480V260H420V340" marker-end="url(#arrowhead)" />
+        <path class="route route-in" d="M540 85V200" marker-end="url(#arrowhead)" />
 
         <!-- ═══ ROUTES — diverging bottom half (waist → destinations) ═══ -->
         <path class="route route-out" d="M220 500V600H130V740H60V880" marker-end="url(#arrowhead)" />
@@ -348,6 +380,10 @@
         <!-- ═══ LANES — secondary branch connections ═══ -->
         <path class="lane" d="M55 80H55V130H100" />
         <path class="lane" d="M390 110H400V170H360" />
+        <path class="lane" d="M660 50H680V100H640" />
+        <path class="lane" d="M540 85H580V130" />
+        <path class="lane" d="M540 200H600V240" />
+        <path class="lane" d="M420 340H460V380" />
         <path class="lane" d="M140 270H80V310" />
         <path class="lane" d="M320 340H380V390" />
         <path class="lane" d="M220 460H280V500" />
@@ -367,6 +403,9 @@
         <line class="tick" x1="217" y1="280" x2="223" y2="280" />
         <line class="tick" x1="307" y1="140" x2="313" y2="140" />
         <line class="tick" x1="387" y1="170" x2="393" y2="170" />
+        <line class="tick" x1="597" y1="120" x2="603" y2="120" />
+        <line class="tick" x1="657" y1="90" x2="663" y2="90" />
+        <line class="tick" x1="537" y1="145" x2="543" y2="145" />
         <!-- Waist ticks -->
         <line class="tick" x1="217" y1="430" x2="223" y2="430" />
         <line class="tick" x1="217" y1="530" x2="223" y2="530" />
@@ -385,6 +424,8 @@
         <text class="hub-label" x="220" y="88">WAREHOUSE</text>
         <text class="hub-label" x="310" y="58">PLANT</text>
         <text class="hub-label" x="390" y="98">VENDOR</text>
+        <text class="hub-label" x="660" y="38">IMPORT</text>
+        <text class="hub-label" x="540" y="73">3PL</text>
         <!-- Collection hubs -->
         <text class="hub-label" x="140" y="258">COLLECT</text>
         <text class="hub-label" x="320" y="328">STAGING</text>
@@ -409,6 +450,8 @@
         <circle class="hub hub-origin" cx="220" cy="100" r="9" />
         <circle class="hub hub-origin" cx="310" cy="70" r="8" />
         <circle class="hub hub-origin" cx="390" cy="110" r="8" />
+        <circle class="hub hub-origin" cx="660" cy="50" r="8" />
+        <circle class="hub hub-origin" cx="540" cy="85" r="7" />
         <!-- Collection hubs (y:270, 340) -->
         <circle class="hub hub-origin" cx="140" cy="270" r="10" />
         <circle class="hub hub-origin" cx="320" cy="340" r="10" />
@@ -429,6 +472,10 @@
         <!-- ═══ WAYPOINT NODES (small) ═══ -->
         <circle class="node" cx="100" cy="130" r="4" />
         <circle class="node" cx="360" cy="170" r="4" />
+        <circle class="node" cx="640" cy="100" r="4" />
+        <circle class="node" cx="580" cy="130" r="4" />
+        <circle class="node" cx="600" cy="240" r="4" />
+        <circle class="node" cx="460" cy="380" r="4" />
         <circle class="node" cx="80" cy="310" r="4" />
         <circle class="node" cx="380" cy="390" r="4" />
         <circle class="node" cx="280" cy="500" r="4" />
@@ -470,6 +517,8 @@
         <text class="location-code" x="220" y="122">BOG</text>
         <text class="location-code" x="310" y="90">MDE</text>
         <text class="location-code" x="390" y="130">CLO</text>
+        <text class="location-code" x="660" y="70">SHA</text>
+        <text class="location-code" x="540" y="105">SJO</text>
         <!-- Collection / consolidation -->
         <text class="location-code" x="140" y="290">CTG</text>
         <text class="location-code" x="320" y="360">PTY</text>
@@ -487,6 +536,7 @@
         <!-- ═══ REFERENCE NUMBERS in whitespace ═══ -->
         <text class="ref-number" x="42" y="180">045-84291763</text>
         <text class="ref-number" x="340" y="240">MSCU4821903</text>
+        <text class="ref-number" x="570" y="170">CIF SHA</text>
         <text class="ref-number" x="42" y="410">LCL &gt; FCL</text>
         <text class="ref-number" x="320" y="550">FOB CTG</text>
         <text class="ref-number" x="42" y="720">DDP SCL</text>
@@ -549,11 +599,11 @@
   </div>
 
   <div
-    class="hero-content relative z-10 mx-auto grid w-full max-w-7xl items-center gap-y-6 lg:grid-cols-12 lg:gap-x-8 lg:gap-y-0"
+    class="hero-content relative z-10 mx-auto grid w-full max-w-7xl items-center gap-y-6 lg:grid-cols-12 lg:gap-x-6 lg:gap-y-0"
   >
     <!-- Left column: narrative -->
     <div class="flex flex-col lg:col-span-7">
-      <div use:reveal class="hero-kicker-block mb-5" data-reveal>
+      <div use:reveal class="hero-kicker-block mb-8" data-reveal>
         <div class="hero-kicker-row">
           <span class="hero-kicker-rule" aria-hidden="true"></span>
           <p class="hero-brand-name mb-0">{t.hero.kicker}</p>
@@ -563,7 +613,7 @@
 
       <h1
         use:reveal={{ y: 28 }}
-        class="hero-title mb-6 max-w-[26ch] font-serif font-bold text-text-primary"
+        class="hero-title mb-8 max-w-[26ch] font-serif font-bold"
         data-reveal
       >
         {t.hero.title}
@@ -571,7 +621,7 @@
 
       <p
         use:reveal={{ delay: 0.08 }}
-        class="hero-subtitle mb-8 max-w-[32rem] text-text-secondary"
+        class="hero-subtitle mb-10 max-w-[32rem]"
         data-reveal
       >
         {t.hero.subtitle}
@@ -579,7 +629,7 @@
 
       <div
         use:reveal={{ delay: 0.14 }}
-        class="mb-6 flex flex-wrap items-center gap-x-6 gap-y-3"
+        class="mb-6 flex flex-col items-start gap-3"
         data-reveal
       >
         <a
@@ -607,16 +657,6 @@
         </a>
       </div>
 
-      <div use:reveal={{ delay: 0.2 }} class="hero-manifest-strip mt-4" data-reveal>
-        <span class="hero-manifest-strip-label" aria-hidden="true">ROUTING</span>
-        <span class="hero-manifest-strip-rule" aria-hidden="true"></span>
-        {#each t.hero.notePills as pill, i}
-          <span class="hero-manifest-strip-item">
-            <span class="hero-manifest-strip-code" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-            {pill}
-          </span>
-        {/each}
-      </div>
     </div>
 
     <!-- Right column: metrics manifest panel -->
@@ -671,25 +711,22 @@
       </div>
 
       <div class="hero-proof-footer">
-        <div class="hero-proof-barcode" aria-hidden="true">
-          {#each Array(12) as _, i}
-            <span class="hero-proof-bar" style:width="{i % 3 === 0 ? 3 : 1.5}px"></span>
-          {/each}
-        </div>
         <p class="hero-proof-note">{t.hero.cardNote}</p>
         <span class="hero-proof-page" aria-hidden="true">1/1</span>
       </div>
     </div>
-  </div>
 
-  <div
-    class="scroll-prompt"
-    class:scroll-prompt-hidden={!scrollPromptVisible}
-    aria-hidden="true"
-  >
-    <svg width="20" height="10" viewBox="0 0 20 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M2 2l8 6 8-6"/>
-    </svg>
+    <!-- Routing strip — full-width row inside grid -->
+    <div use:reveal={{ delay: 0.24 }} class="hero-manifest-strip lg:col-span-12 mt-12" data-reveal>
+      <span class="hero-manifest-strip-label" aria-hidden="true">ROUTING</span>
+      <span class="hero-manifest-strip-rule" aria-hidden="true"></span>
+      {#each t.hero.notePills as pill, i}
+        <span class="hero-manifest-strip-item">
+          <span class="hero-manifest-strip-code" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          {pill}
+        </span>
+      {/each}
+    </div>
   </div>
 </section>
 
@@ -710,7 +747,7 @@
   .hero-kicker-rule {
     width: 2.4rem;
     height: 1.5px;
-    background: var(--color-brand-42);
+    background: #2D8F6A;
   }
 
   .hero-brand-name {
@@ -718,7 +755,7 @@
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--color-accent-deep);
+    color: #1A1A1A;
     line-height: 1;
   }
 
@@ -726,7 +763,7 @@
     margin: 0;
     padding-left: calc(2.4rem + 0.75rem);
     font-size: 0.84rem;
-    color: var(--color-text-secondary);
+    color: #666;
     line-height: 1.3;
   }
 
@@ -736,6 +773,7 @@
     line-height: 1.08;
     letter-spacing: -0.02em;
     text-wrap: balance;
+    color: #111;
   }
 
   /* ── Subtitle ── */
@@ -743,15 +781,17 @@
     font-size: clamp(1.02rem, 0.98rem + 0.25vw, 1.18rem);
     line-height: 1.48;
     letter-spacing: -0.008em;
+    color: #444;
   }
 
   /* ── Manifest routing strip ── */
   .hero-manifest-strip {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0;
-    border-top: 1px solid var(--color-brand-14);
-    border-bottom: 1px solid var(--color-brand-14);
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
     padding: 0.4rem 0;
   }
 
@@ -760,7 +800,7 @@
     font-size: 0.56rem;
     font-weight: 700;
     letter-spacing: 0.18em;
-    color: var(--color-brand-22);
+    color: #aaa;
     text-transform: uppercase;
     flex-shrink: 0;
     padding-right: 0.6rem;
@@ -769,7 +809,7 @@
   .hero-manifest-strip-rule {
     width: 1px;
     height: 18px;
-    background: var(--color-brand-16);
+    background: #ddd;
     flex-shrink: 0;
   }
 
@@ -782,8 +822,8 @@
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--color-text-secondary);
-    border-right: 1px solid var(--color-brand-10);
+    color: #333;
+    border-right: 1px solid #e8e8e8;
     line-height: 1;
     white-space: nowrap;
   }
@@ -796,7 +836,7 @@
     font-family: var(--font-sans);
     font-size: 0.56rem;
     font-weight: 700;
-    color: var(--color-brand-36);
+    color: #999;
     font-variant-numeric: tabular-nums;
   }
 
@@ -805,16 +845,17 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.55rem 1rem 0.55rem 0;
+    padding: 0.65rem 1.15rem 0.65rem 0;
     font-size: 0.92rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.02em;
     color: var(--color-bg-card);
-    background: var(--color-accent-deep);
+    background: #2D8F6A;
     border: none;
     border-left: 2.5px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 2px 8px rgba(45, 143, 106, 0.2);
     text-decoration: none;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
   .hero-cta-ref {
@@ -826,18 +867,19 @@
     font-size: 0.52rem;
     font-weight: 700;
     letter-spacing: 0.1em;
-    color: rgba(255, 255, 255, 0.55);
-    background: rgba(255, 255, 255, 0.04);
+    color: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.06);
     align-self: stretch;
   }
 
   .hero-cta-primary:hover {
-    background: var(--color-gradient-deep);
+    background: #257A5A;
     border-left-color: rgba(255, 255, 255, 0.28);
+    box-shadow: 0 4px 14px rgba(45, 143, 106, 0.3);
   }
 
   .hero-cta-primary:active {
-    background: var(--color-accent-deep);
+    background: #2D8F6A;
   }
 
   .hero-cta-arrow {
@@ -856,7 +898,7 @@
   /* ── Secondary link ── */
   .hero-secondary-link {
     position: relative;
-    color: var(--color-text-secondary);
+    color: #555;
     font-size: clamp(0.95rem, 0.94rem + 0.1vw, 1.04rem);
     text-decoration: none;
   }
@@ -868,12 +910,12 @@
     left: 50%;
     width: 0;
     height: 1.5px;
-    background: var(--color-accent-deep);
+    background: #333;
     transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1), left 0.3s cubic-bezier(0.25, 1, 0.5, 1);
   }
 
   .hero-secondary-link:hover {
-    color: var(--color-text-primary);
+    color: #111;
   }
 
   .hero-secondary-link:hover::after {
@@ -884,14 +926,14 @@
   /* ── Blueprint SVG ── */
   .hero-blueprint-field {
     position: absolute;
-    top: 0;
-    left: 50%;
+    top: 5%;
+    left: 53%;
     transform: translateX(-50%);
-    width: min(48vw, 580px);
-    height: 100%;
+    width: min(68vw, 860px);
+    height: 85%;
     opacity: 1;
-    mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.3) 18%, rgba(0, 0, 0, 0.65) 38%, rgba(0, 0, 0, 0.65) 62%, rgba(0, 0, 0, 0.3) 82%, transparent 100%),
-      linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 8%, rgba(0, 0, 0, 0.85) 25%, rgba(0, 0, 0, 0.85) 75%, rgba(0, 0, 0, 0.5) 92%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.3) 12%, rgba(0, 0, 0, 0.65) 30%, rgba(0, 0, 0, 0.65) 55%, rgba(0, 0, 0, 0.4) 78%, rgba(0, 0, 0, 0.2) 90%, transparent 100%),
+      linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.6) 6%, rgba(0, 0, 0, 0.85) 20%, rgba(0, 0, 0, 0.85) 80%, rgba(0, 0, 0, 0.5) 94%, transparent 100%);
     -webkit-mask-composite: source-in;
     mask-composite: intersect;
   }
@@ -1077,7 +1119,7 @@
     left: 0;
     width: 8px;
     height: 1px;
-    background: var(--color-brand-22);
+    background: #ccc;
   }
 
   .hero-doc-margin-top {
@@ -1129,7 +1171,7 @@
   /* ── Metrics manifest panel ── */
   .hero-proof-band {
     background: var(--color-bg-card);
-    border: 1.5px solid var(--color-brand-22);
+    border: 1.5px solid #d4d4d4;
     position: relative;
     z-index: 2;
   }
@@ -1148,8 +1190,8 @@
     left: -8px;
     width: 24px;
     height: 24px;
-    border-top: 2px solid var(--color-brand-42);
-    border-left: 2px solid var(--color-brand-42);
+    border-top: 2px solid #aaa;
+    border-left: 2px solid #aaa;
   }
 
   .hero-proof-band::after {
@@ -1157,8 +1199,8 @@
     right: -5px;
     width: 14px;
     height: 14px;
-    border-bottom: 1.5px solid var(--color-brand-28);
-    border-right: 1.5px solid var(--color-brand-28);
+    border-bottom: 1.5px solid #bbb;
+    border-right: 1.5px solid #bbb;
   }
 
   /* Stamped document header */
@@ -1167,9 +1209,9 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.65rem 1rem;
-    background: var(--color-brand-5);
-    border-top: 2px solid var(--color-brand-36);
-    border-bottom: 1.5px solid var(--color-brand-22);
+    background: #fafafa;
+    border-top: 2px solid #2D8F6A;
+    border-bottom: 1.5px solid #ddd;
   }
 
   .hero-proof-header-title {
@@ -1177,14 +1219,14 @@
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--color-accent-deep);
+    color: #1A1A1A;
   }
 
   .hero-proof-header-ref {
     font-size: 0.56rem;
     font-weight: 600;
     letter-spacing: 0.08em;
-    color: var(--color-brand-36);
+    color: #999;
     font-variant-numeric: tabular-nums;
   }
 
@@ -1194,8 +1236,8 @@
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--color-brand-36);
-    border: 1px solid var(--color-brand-16);
+    color: #999;
+    border: 1px solid #ddd;
     padding: 0.1rem 0.4rem;
     line-height: 1.3;
   }
@@ -1205,8 +1247,8 @@
     align-items: center;
     gap: 0.4rem;
     padding: 0.3rem 1rem;
-    border-bottom: 1px dashed var(--color-brand-14);
-    background: var(--color-brand-3);
+    border-bottom: 1px dashed #e5e5e5;
+    background: #fafafa;
   }
 
   .hero-proof-meta-field {
@@ -1214,13 +1256,13 @@
     font-size: 0.5rem;
     font-weight: 600;
     letter-spacing: 0.1em;
-    color: var(--color-brand-36);
+    color: #999;
     font-variant-numeric: tabular-nums;
   }
 
   .hero-proof-meta-sep {
     font-size: 0.5rem;
-    color: var(--color-brand-16);
+    color: #ddd;
   }
 
   .hero-proof-grid {
@@ -1241,8 +1283,8 @@
   }
 
   .hero-proof-stat:hover {
-    border-left-color: var(--color-accent);
-    background: var(--color-brand-3);
+    border-left-color: #2D8F6A;
+    background: #fafafa;
   }
 
   /* Dashed field separators — manifest style */
@@ -1252,7 +1294,7 @@
     top: 0;
     left: 0;
     right: 0;
-    border-top: 1.5px dashed var(--color-brand-16);
+    border-top: 1.5px dashed #e0e0e0;
   }
 
   .hero-proof-field-head {
@@ -1268,14 +1310,14 @@
     font-weight: 700;
     letter-spacing: 0.06em;
     color: var(--color-bg-card);
-    background: var(--color-accent-deep);
+    background: #2D8F6A;
     padding: 0.1rem 0.35rem;
     border-radius: 2px;
     line-height: 1.4;
   }
 
   .hero-proof-label {
-    color: var(--color-text-secondary);
+    color: #555;
     font-size: 0.64rem;
     font-weight: 600;
     letter-spacing: 0.10em;
@@ -1288,7 +1330,7 @@
     font-size: 0.48rem;
     font-weight: 600;
     letter-spacing: 0.04em;
-    color: var(--color-brand-22);
+    color: #bbb;
     margin-left: auto;
     font-variant-numeric: tabular-nums;
   }
@@ -1302,13 +1344,13 @@
   .hero-proof-arrow {
     width: 16px;
     height: 16px;
-    color: var(--color-accent-deep);
+    color: #2D8F6A;
     flex-shrink: 0;
-    opacity: 0.7;
+    opacity: 0.8;
   }
 
   .hero-proof-value {
-    color: var(--color-text-primary);
+    color: #111;
     font-family: var(--font-sans);
     font-weight: 800;
     font-size: clamp(1.8rem, 2.4vw, 2.4rem);
@@ -1318,31 +1360,16 @@
   }
 
   .hero-proof-footer {
-    border-top: 1.5px solid var(--color-brand-16);
+    border-top: 1.5px solid #e0e0e0;
     padding: 0.6rem 1rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
   }
 
-  .hero-proof-barcode {
-    display: flex;
-    align-items: stretch;
-    gap: 2px;
-    height: 16px;
-    flex-shrink: 0;
-    opacity: 0.3;
-  }
-
-  .hero-proof-bar {
-    display: block;
-    background: var(--color-text-primary);
-    border-radius: 0.5px;
-  }
-
-  .hero-proof-note {
+.hero-proof-note {
     font-size: 0.66rem;
-    color: var(--color-text-tertiary);
+    color: #888;
     letter-spacing: 0.01em;
     flex: 1;
   }
@@ -1352,31 +1379,16 @@
     font-size: 0.5rem;
     font-weight: 600;
     letter-spacing: 0.06em;
-    color: var(--color-brand-28);
+    color: #bbb;
     font-variant-numeric: tabular-nums;
     flex-shrink: 0;
   }
 
-  /* ── Scroll prompt ── */
-  .scroll-prompt {
-    display: flex;
-    justify-content: center;
-    padding-bottom: clamp(0.8rem, 1.5vh, 1.5rem);
-    padding-top: clamp(0.5rem, 1vh, 1rem);
-    color: var(--color-text-tertiary);
-    opacity: 0.6;
-    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    animation: scroll-bob 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-  }
-
-  .scroll-prompt-hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  @keyframes scroll-bob {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(5px); }
+  /* ── Desktop proof-band alignment ── */
+  @media (min-width: 1025px) {
+    .hero-proof-band {
+      margin-top: 1.5rem;
+    }
   }
 
   /* ── Responsive ── */
@@ -1440,9 +1452,6 @@
       font-size: clamp(1.5rem, 6vw, 1.8rem);
     }
 
-    .hero-proof-barcode {
-      display: none;
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {
