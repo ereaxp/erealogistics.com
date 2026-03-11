@@ -3,7 +3,7 @@
 @source "./**/*.{svelte,ts}";
 
 @theme {
-  --color-bg-primary: #F7F8F3;
+  --color-bg-primary: #FAFBF7;
   --color-bg-secondary: #EDF5EE;
   --color-bg-tertiary: #E5F1E8;
   --color-bg-card: #FEFFFB;
@@ -64,7 +64,7 @@
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
   }
 
   body {
@@ -148,8 +148,8 @@ noscript + * [data-reveal],
 }
 
 @utility text-hero {
-  font-size: clamp(2.4rem, 4.2vw, 3.6rem);
-  line-height: 1.04;
+  font-size: clamp(2.4rem, 4vw, 3.5rem);
+  line-height: 1.08;
 }
 
 @utility text-h2 {

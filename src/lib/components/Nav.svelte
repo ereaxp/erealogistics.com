@@ -128,14 +128,6 @@
     </div>
 
     <div class="flex items-center justify-end gap-2 sm:gap-3">
-      <a
-        href="#contact"
-        onclick={(e) => { e.preventDefault(); scrollTo('contact'); }}
-        class="button-primary hidden px-3 py-1.5 text-sm lg:inline-flex"
-      >
-        {t.nav.cta}
-      </a>
-
       <button
         onclick={() => lang.toggle()}
         class="nav-lang-toggle text-label uppercase text-text-tertiary transition-colors duration-200 hover:text-text-primary"

@@ -1,6 +1,5 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Lenis from 'lenis';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -8,37 +7,37 @@ if (typeof window !== 'undefined') {
 
 // ─── Easing constants ───
 export const REVEAL_EASES = {
-  title:    'power3.out',      // clean authority, no overshoot
-  body:     'power3.out',      // smooth for supporting text
-  cta:      'power2.out',      // snappier for action intent
-  line:     'power4.out',      // decisive line draws
-  clip:     'power3.out',      // clip-path labels
+  title:    'power3.out',
+  body:     'power3.out',
+  cta:      'power2.out',
+  line:     'power4.out',
+  clip:     'power3.out',
 } as const;
 
 // ─── Duration constants ───
 export const DURATION = {
-  fast:   0.4,   // labels, small elements, stagger children
-  normal: 0.8,   // primary reveals (body, titles, cards)
-  slow:   1.1,   // line draws, clip reveals, hero entrance
+  fast:   0.4,
+  normal: 0.8,
+  slow:   1.1,
 } as const;
 
 // ─── Y-offset constants ───
 export const OFFSET = {
-  sm: 12,   // captions, labels, secondary prose
-  md: 24,   // body text, cards, standard reveals
-  lg: 40,   // hero headline only
+  sm: 12,
+  md: 24,
+  lg: 40,
 } as const;
 
 // ─── Stagger constants ───
 export const STAGGER = {
-  tight: 0.06,  // words, list items, small elements
-  loose: 0.12,  // cards, grid children
+  tight: 0.06,
+  loose: 0.12,
 } as const;
 
 // ─── Parallax speed constants ───
 export const PARALLAX_SPEED = {
-  subtle: 0.05,  // dot grids, background textures
-  normal: 0.08,  // primary ambient viz layers
+  subtle: 0.05,
+  normal: 0.08,
 } as const;
 
 // ─── ScrollTrigger start positions ───
@@ -50,15 +49,12 @@ export const TRIGGER = {
   late:   `top ${TRIGGER_LATE_RATIO * 100}%`,
 } as const;
 
-let lenis: Lenis | null = null;
-let tickerCallback: ((time: number) => void) | null = null;
-
 export function prefersReducedMotion(): boolean {
   return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-export function getLenis(): Lenis | null {
-  return lenis;
+export function getLenis(): null {
+  return null;
 }
 
 export function getNavHeight(): number {
@@ -71,20 +67,15 @@ export function scrollToSection(id: string) {
     if (import.meta.env.DEV) console.warn(`scrollToSection: "#${id}" not found`);
     return;
   }
-  const l = getLenis();
-  if (l) l.scrollTo(`#${id}`, { offset: -getNavHeight() });
-  else target.scrollIntoView({ behavior: 'smooth' });
+  const navH = getNavHeight();
+  const y = target.getBoundingClientRect().top + window.scrollY - navH;
+  window.scrollTo({ top: y, behavior: 'auto' });
 }
 
 export function refreshScrollTrigger() {
   ScrollTrigger.refresh();
 }
 
-/**
- * After language toggle, force any once-animated scaleX lines already past
- * their trigger point to their end state. ScrollTrigger.refresh() recalculates
- * positions but won't replay killed `once: true` triggers.
- */
 export function snapPassedAnimations() {
   if (typeof document === 'undefined') return;
   const cutoff = window.scrollY + window.innerHeight * TRIGGER_LATE_RATIO;
@@ -95,35 +86,9 @@ export function snapPassedAnimations() {
   }
 }
 
-export function initSmoothScroll() {
-  if (typeof window === 'undefined') return;
-
-  const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
-  if (isCoarsePointer || prefersReducedMotion()) return;
-
-  lenis = new Lenis({
-    duration: 0.9,
-    easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    smoothWheel: true
-  });
-
-  lenis.on('scroll', ScrollTrigger.update);
-
-  tickerCallback = (time: number) => {
-    lenis?.raf(time * 1000);
-  };
-  gsap.ticker.add(tickerCallback);
-  gsap.ticker.lagSmoothing(500, 33);
-}
-
+export function initSmoothScroll() {}
 export function destroySmoothScroll() {
-  if (tickerCallback) {
-    gsap.ticker.remove(tickerCallback);
-    tickerCallback = null;
-  }
   ScrollTrigger.killAll();
-  lenis?.destroy();
-  lenis = null;
 }
 
 /** Fade-up reveal — primary section entrance */
@@ -265,12 +230,8 @@ export function countUpOnScroll(el: HTMLElement) {
 
   const rawValue = el.getAttribute('data-value') ?? '0';
   const format = el.getAttribute('data-format') ?? '';
-
-  // Parse numeric part
   const numericStr = rawValue.replace(/[^0-9.]/g, '');
   const targetVal = parseFloat(numericStr) || 0;
-
-  // Determine prefix/suffix from format
   const prefix = format.startsWith('+') ? '+' : format.startsWith('-') ? '-' : '';
   const suffix = format.replace(/^[+-]/, '');
 
@@ -292,12 +253,10 @@ export function countUpOnScroll(el: HTMLElement) {
     },
     onUpdate() {
       const current = Math.round(obj.val);
-      // Format with commas for large numbers
       const formatted = current >= 1000 ? current.toLocaleString('en-US') : String(current);
       el.innerText = `${prefix}${formatted}${suffix}`;
     },
     onComplete() {
-      // Set final value exactly as intended
       el.innerText = `${prefix}${rawValue}${suffix}`;
     },
   });

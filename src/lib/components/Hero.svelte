@@ -23,69 +23,119 @@
 
 
   onMount(() => {
-    if (!blueprintSvg || prefersReducedMotion()) return;
+    if (!blueprintSvg) return;
 
-    const routes = blueprintSvg.querySelectorAll('.route');
+    const routesIn = blueprintSvg.querySelectorAll('.route-in');
+    const routesOut = blueprintSvg.querySelectorAll('.route-out');
     const lanes = blueprintSvg.querySelectorAll('.lane');
-    const hubs = blueprintSvg.querySelectorAll('.hub');
+    const hubsOrigin = blueprintSvg.querySelectorAll('.hub-origin');
+    const hubCentral = blueprintSvg.querySelectorAll('.hub-central');
+    const hubsDestination = blueprintSvg.querySelectorAll('.hub-destination');
     const nodes = blueprintSvg.querySelectorAll('.node');
     const labels = blueprintSvg.querySelectorAll('.hub-label');
+    const locationCodes = blueprintSvg.querySelectorAll('.location-code');
+    const refNumbers = blueprintSvg.querySelectorAll('.ref-number');
+    const manifestRows = blueprintSvg.querySelectorAll('.manifest-rows');
+    const handlingMark = blueprintSvg.querySelectorAll('.handling-mark');
 
-    // Prepare routes for stroke drawing
-    routes.forEach(route => {
-      const length = (route as SVGPathElement).getTotalLength();
-      gsap.set(route, { strokeDasharray: length, strokeDashoffset: length });
-    });
-    lanes.forEach(lane => {
-      const length = (lane as SVGPathElement).getTotalLength();
-      gsap.set(lane, { strokeDasharray: length, strokeDashoffset: length });
-    });
+    const setDashHidden = (el: Element) => {
+      const length = (el as SVGPathElement).getTotalLength();
+      gsap.set(el, { strokeDasharray: length, strokeDashoffset: length });
+    };
 
-    gsap.set(hubs, { scale: 0, transformOrigin: 'center center' });
+    routesIn.forEach(setDashHidden);
+    routesOut.forEach(setDashHidden);
+    lanes.forEach(el => setDashHidden(el));
+
+    gsap.set([hubsOrigin, hubCentral, hubsDestination], { scale: 0, transformOrigin: 'center center' });
     gsap.set(nodes, { scale: 0, transformOrigin: 'center center' });
-    gsap.set(labels, { opacity: 0 });
+    gsap.set(labels, { opacity: 0, y: 4 });
+    gsap.set(locationCodes, { opacity: 0 });
+    gsap.set(refNumbers, { opacity: 0 });
+    gsap.set(manifestRows, { opacity: 0 });
+    gsap.set(handlingMark, { opacity: 0 });
 
-    const tl = gsap.timeline({ delay: 0.6 });
+    const tl = gsap.timeline({ delay: 0.5 });
 
-    // Draw routes
-    tl.to(routes, {
-      strokeDashoffset: 0,
-      duration: 1.8,
-      stagger: 0.3,
-      ease: 'power2.inOut',
+    // Phase 1: Origins appear, converging routes draw downward
+    tl.to(hubsOrigin, {
+      scale: 1,
+      duration: 0.35,
+      stagger: 0.06,
+      ease: 'back.out(1.8)',
     });
 
-    // Draw lanes slightly after
+    tl.to(routesIn, {
+      strokeDashoffset: 0,
+      duration: 1.0,
+      stagger: 0.12,
+      ease: 'power2.inOut',
+    }, '-=0.15');
+
+    // Phase 2: Central hub pops as routes arrive
+    tl.to(hubCentral, {
+      scale: 1,
+      duration: 0.4,
+      ease: 'back.out(2.5)',
+    }, '-=0.3');
+
+    // Phase 3: Diverging routes draw outward, destinations appear
+    tl.to(routesOut, {
+      strokeDashoffset: 0,
+      duration: 1.0,
+      stagger: 0.12,
+      ease: 'power2.inOut',
+    }, '-=0.15');
+
+    tl.to(hubsDestination, {
+      scale: 1,
+      duration: 0.35,
+      stagger: 0.06,
+      ease: 'back.out(1.8)',
+    }, '-=0.4');
+
+    // Phase 4: Supporting details cascade in
     tl.to(lanes, {
       strokeDashoffset: 0,
-      duration: 1.2,
-      stagger: 0.15,
+      duration: 0.8,
+      stagger: 0.1,
       ease: 'power2.inOut',
-    }, '-=1.4');
+    }, '-=0.6');
 
-    // Pop in hubs
-    tl.to(hubs, {
-      scale: 1,
-      duration: 0.5,
-      stagger: 0.08,
-      ease: 'back.out(2)',
-    }, '-=0.8');
-
-    // Fade in nodes
     tl.to(nodes, {
       scale: 1,
+      duration: 0.3,
+      stagger: 0.04,
+      ease: 'power2.out',
+    }, '-=0.5');
+
+    tl.to(labels, {
+      opacity: 1,
+      y: 0,
+      duration: 0.4,
+      stagger: 0.05,
+      ease: 'power2.out',
+    }, '-=0.3');
+
+    tl.to(locationCodes, {
+      opacity: 1,
+      duration: 0.35,
+      stagger: 0.04,
+      ease: 'power2.out',
+    }, '-=0.2');
+
+    tl.to(refNumbers, {
+      opacity: 1,
       duration: 0.35,
       stagger: 0.05,
       ease: 'power2.out',
-    }, '-=0.4');
+    }, '-=0.2');
 
-    // Labels fade in
-    tl.to(labels, {
+    tl.to([manifestRows, handlingMark], {
       opacity: 1,
-      duration: 0.6,
-      stagger: 0.06,
+      duration: 0.4,
       ease: 'power2.out',
-    }, '-=0.3');
+    }, '-=0.15');
 
     return () => { tl.kill(); };
   });
@@ -94,109 +144,240 @@
 <svelte:window onscroll={handleScroll} />
 
 <section id="hero" class="hero-section relative overflow-hidden px-container">
+  <!-- Document margin signals -->
+  <div class="hero-doc-margin" aria-hidden="true">
+    <span class="hero-doc-margin-mark hero-doc-margin-top"></span>
+    <span class="hero-doc-margin-mark hero-doc-margin-mid"></span>
+    <span class="hero-doc-margin-mark hero-doc-margin-bot"></span>
+    <span class="hero-doc-fold" aria-hidden="true"></span>
+  </div>
+
   <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
     <div class="hero-blueprint-field">
       <div class="hero-blueprint-grid"></div>
       <div class="hero-blueprint-frame"></div>
-      <svg bind:this={blueprintSvg} class="hero-blueprint-map" viewBox="0 0 900 560" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg bind:this={blueprintSvg} class="hero-blueprint-map" viewBox="0 0 440 960" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <marker id="arrowhead" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
             <polygon points="0 0, 6 2, 0 4" fill="rgba(0,80,47,0.40)" />
           </marker>
         </defs>
 
-        <path class="guide" d="M138 72V504" />
-        <path class="guide" d="M362 56V520" />
-        <path class="guide" d="M614 90V522" />
-        <path class="guide" d="M92 168H760" />
-        <path class="guide" d="M116 338H820" />
+        <!-- ═══ GUIDE LINES ═══ -->
+        <!-- Vertical guides -->
+        <path class="guide" d="M70 30V930" />
+        <path class="guide" d="M220 30V930" />
+        <path class="guide" d="M370 30V930" />
+        <!-- Horizontal guides — mark the five topology zones -->
+        <path class="guide" d="M40 120H400" />
+        <path class="guide" d="M40 320H400" />
+        <path class="guide" d="M40 460H400" />
+        <path class="guide" d="M40 620H400" />
+        <path class="guide" d="M40 800H400" />
 
-        <path class="route" d="M84 132H252V182H430V114H660V190H814" marker-end="url(#arrowhead)" />
-        <path class="route" d="M120 258H308V214H466V292H624V234H790" marker-end="url(#arrowhead)" />
-        <path class="route" d="M186 406H360V356H554V430H702V374H838" marker-end="url(#arrowhead)" />
+        <!-- ═══ ROUTES — converging top half (origins → waist) ═══ -->
+        <path class="route route-in" d="M55 80V270H140V270V460H220" marker-end="url(#arrowhead)" />
+        <path class="route route-in" d="M150 60V200H140V270" marker-end="url(#arrowhead)" />
+        <path class="route route-in" d="M220 100V460" marker-end="url(#arrowhead)" />
+        <path class="route route-in" d="M310 70V210H320V340H220V460" marker-end="url(#arrowhead)" />
+        <path class="route route-in" d="M390 110V220H320V340" marker-end="url(#arrowhead)" />
 
-        <path class="lane" d="M250 182V298H430" />
-        <path class="lane" d="M466 292V356H554" />
-        <path class="lane" d="M660 190V234H790" />
-        <path class="lane" d="M624 234V430H702" />
+        <!-- ═══ ROUTES — diverging bottom half (waist → destinations) ═══ -->
+        <path class="route route-out" d="M220 500V600H130V740H60V880" marker-end="url(#arrowhead)" />
+        <path class="route route-out" d="M130 740V760H160V900" marker-end="url(#arrowhead)" />
+        <path class="route route-out" d="M220 500V860" marker-end="url(#arrowhead)" />
+        <path class="route route-out" d="M220 500V580H310V660V760H300V900" marker-end="url(#arrowhead)" />
+        <path class="route route-out" d="M310 760H380V880" marker-end="url(#arrowhead)" />
 
-        <line class="tick" x1="168" y1="129" x2="168" y2="135" />
-        <line class="tick" x1="340" y1="179" x2="340" y2="185" />
-        <line class="tick" x1="545" y1="111" x2="545" y2="117" />
-        <line class="tick" x1="740" y1="187" x2="740" y2="193" />
-        <line class="tick" x1="210" y1="255" x2="210" y2="261" />
-        <line class="tick" x1="390" y1="211" x2="390" y2="217" />
-        <line class="tick" x1="540" y1="289" x2="540" y2="295" />
-        <line class="tick" x1="270" y1="403" x2="270" y2="409" />
-        <line class="tick" x1="460" y1="353" x2="460" y2="359" />
-        <line class="tick" x1="770" y1="371" x2="770" y2="377" />
+        <!-- ═══ LANES — secondary branch connections ═══ -->
+        <path class="lane" d="M55 80H55V130H100" />
+        <path class="lane" d="M390 110H400V170H360" />
+        <path class="lane" d="M140 270H80V310" />
+        <path class="lane" d="M320 340H380V390" />
+        <path class="lane" d="M220 460H280V500" />
+        <path class="lane" d="M220 460H160V500" />
+        <path class="lane" d="M130 740H70V780" />
+        <path class="lane" d="M310 760H370V800" />
+        <path class="lane" d="M60 880H60V920H100" />
+        <path class="lane" d="M380 880H400V920H360" />
 
-        <text class="hub-label" x="252" y="170">DC-01</text>
-        <text class="hub-label" x="430" y="102">HUB-A</text>
-        <text class="hub-label" x="466" y="280">HUB-B</text>
-        <text class="hub-label" x="624" y="222">HUB-C</text>
-        <text class="hub-label" x="814" y="178">PORT</text>
-        <text class="hub-label" x="702" y="362">DC-02</text>
+        <!-- ═══ TICK MARKS along routes ═══ -->
+        <!-- Top half ticks -->
+        <line class="tick" x1="52" y1="140" x2="58" y2="140" />
+        <line class="tick" x1="52" y1="200" x2="58" y2="200" />
+        <line class="tick" x1="147" y1="130" x2="153" y2="130" />
+        <line class="tick" x1="217" y1="180" x2="223" y2="180" />
+        <line class="tick" x1="217" y1="280" x2="223" y2="280" />
+        <line class="tick" x1="307" y1="140" x2="313" y2="140" />
+        <line class="tick" x1="387" y1="170" x2="393" y2="170" />
+        <!-- Waist ticks -->
+        <line class="tick" x1="217" y1="430" x2="223" y2="430" />
+        <line class="tick" x1="217" y1="530" x2="223" y2="530" />
+        <!-- Bottom half ticks -->
+        <line class="tick" x1="127" y1="670" x2="133" y2="670" />
+        <line class="tick" x1="57" y1="810" x2="63" y2="810" />
+        <line class="tick" x1="217" y1="700" x2="223" y2="700" />
+        <line class="tick" x1="217" y1="790" x2="223" y2="790" />
+        <line class="tick" x1="307" y1="710" x2="313" y2="710" />
+        <line class="tick" x1="377" y1="830" x2="383" y2="830" />
 
-        <circle class="hub" cx="252" cy="182" r="10" />
-        <circle class="hub" cx="430" cy="114" r="10" />
-        <circle class="hub" cx="466" cy="292" r="11" />
-        <circle class="hub" cx="624" cy="234" r="10" />
-        <circle class="hub" cx="702" cy="374" r="11" />
-        <circle class="hub" cx="814" cy="190" r="12" />
+        <!-- ═══ HUB LABELS ═══ -->
+        <!-- Top origins -->
+        <text class="hub-label" x="55" y="68">SUPPLIER</text>
+        <text class="hub-label" x="150" y="48">FACTORY</text>
+        <text class="hub-label" x="220" y="88">WAREHOUSE</text>
+        <text class="hub-label" x="310" y="58">PLANT</text>
+        <text class="hub-label" x="390" y="98">VENDOR</text>
+        <!-- Collection hubs -->
+        <text class="hub-label" x="140" y="258">COLLECT</text>
+        <text class="hub-label" x="320" y="328">STAGING</text>
+        <!-- Waist — consolidation -->
+        <text class="hub-label" x="220" y="448">CONSOL</text>
+        <text class="hub-label" x="220" y="512">X-DOCK</text>
+        <!-- Distribution hubs -->
+        <text class="hub-label" x="130" y="588">DECON</text>
+        <text class="hub-label" x="310" y="648">DIST</text>
+        <!-- Bottom destinations -->
+        <text class="hub-label" x="60" y="868">RETAIL</text>
+        <text class="hub-label" x="160" y="888">DC-SUR</text>
+        <text class="hub-label" x="220" y="848">PORT</text>
+        <text class="hub-label" x="300" y="888">DC-NORTE</text>
+        <text class="hub-label" x="380" y="868">E-COMM</text>
 
-        <circle class="node" cx="308" cy="214" r="5" />
-        <circle class="node" cx="360" cy="356" r="5" />
-        <circle class="node" cx="554" cy="430" r="5" />
-        <circle class="node" cx="186" cy="406" r="5" />
-        <circle class="node" cx="790" cy="234" r="5" />
+        <!-- ═══ HUB CIRCLES ═══ -->
+        <!-- Top origins (wide spread y:60-110) -->
+        <circle class="hub hub-origin" cx="55" cy="80" r="8" />
+        <circle class="hub hub-origin" cx="150" cy="60" r="8" />
+        <circle class="hub hub-origin" cx="220" cy="100" r="9" />
+        <circle class="hub hub-origin" cx="310" cy="70" r="8" />
+        <circle class="hub hub-origin" cx="390" cy="110" r="8" />
+        <!-- Collection hubs (y:270, 340) -->
+        <circle class="hub hub-origin" cx="140" cy="270" r="10" />
+        <circle class="hub hub-origin" cx="320" cy="340" r="10" />
+        <!-- Waist — consolidation + cross-dock (y:460, 500) -->
+        <circle class="hub hub-central" cx="220" cy="460" r="13" />
+        <circle class="hub hub-central" cx="220" cy="500" r="10" />
+        <!-- Distribution hubs (y:600, 660) -->
+        <circle class="hub hub-destination" cx="130" cy="600" r="10" />
+        <circle class="hub hub-destination" cx="310" cy="660" r="10" />
+        <!-- Bottom destinations (wide spread y:860-900) -->
+        <circle class="hub hub-destination" cx="60" cy="880" r="8" />
+        <circle class="hub hub-destination" cx="160" cy="900" r="8" />
+        <circle class="hub hub-destination" cx="220" cy="860" r="9" />
+        <circle class="hub hub-destination" cx="300" cy="900" r="8" />
+        <circle class="hub hub-destination" cx="380" cy="880" r="8" />
 
-        <rect class="slot" x="540" y="92" width="22" height="10" rx="1" />
-        <rect class="slot" x="568" y="92" width="22" height="10" rx="1" />
-        <rect class="slot" x="596" y="92" width="22" height="10" rx="1" />
-        <rect class="slot" x="624" y="92" width="22" height="10" rx="1" />
-        <rect class="slot" x="652" y="92" width="22" height="10" rx="1" />
-        <rect class="slot" x="540" y="76" width="22" height="10" rx="1" />
-        <rect class="slot" x="568" y="76" width="22" height="10" rx="1" />
-        <rect class="slot" x="596" y="76" width="22" height="10" rx="1" />
-        <rect class="slot" x="624" y="76" width="22" height="10" rx="1" />
+        <!-- ═══ WAYPOINT NODES (small) ═══ -->
+        <circle class="node" cx="100" cy="130" r="4" />
+        <circle class="node" cx="360" cy="170" r="4" />
+        <circle class="node" cx="80" cy="310" r="4" />
+        <circle class="node" cx="380" cy="390" r="4" />
+        <circle class="node" cx="280" cy="500" r="4" />
+        <circle class="node" cx="160" cy="500" r="4" />
+        <circle class="node" cx="130" cy="740" r="4" />
+        <circle class="node" cx="310" cy="760" r="4" />
+        <circle class="node" cx="70" cy="780" r="4" />
+        <circle class="node" cx="370" cy="800" r="4" />
+        <circle class="node" cx="100" cy="920" r="4" />
+        <circle class="node" cx="360" cy="920" r="4" />
 
-        <rect class="slot" x="96" y="364" width="20" height="9" rx="1" />
-        <rect class="slot" x="96" y="378" width="20" height="9" rx="1" />
-        <rect class="slot" x="96" y="392" width="20" height="9" rx="1" />
-        <rect class="slot" x="96" y="406" width="20" height="9" rx="1" />
-        <rect class="slot" x="96" y="420" width="20" height="9" rx="1" />
-        <rect class="slot" x="122" y="364" width="20" height="9" rx="1" />
-        <rect class="slot" x="122" y="378" width="20" height="9" rx="1" />
-        <rect class="slot" x="122" y="392" width="20" height="9" rx="1" />
+        <!-- ═══ CONTAINER SLOT CLUSTERS ═══ -->
+        <!-- Near collect-W hub -->
+        <rect class="slot" x="56" y="282" width="20" height="9" rx="1" />
+        <rect class="slot" x="80" y="282" width="20" height="9" rx="1" />
+        <rect class="slot" x="56" y="296" width="20" height="9" rx="1" />
+        <rect class="slot" x="80" y="296" width="20" height="9" rx="1" />
+        <rect class="slot" x="104" y="282" width="20" height="9" rx="1" />
 
-        <rect class="slot" x="734" y="338" width="22" height="10" rx="1" />
-        <rect class="slot" x="762" y="338" width="22" height="10" rx="1" />
-        <rect class="slot" x="790" y="338" width="22" height="10" rx="1" />
-        <rect class="slot" x="818" y="338" width="22" height="10" rx="1" />
-        <rect class="slot" x="734" y="322" width="22" height="10" rx="1" />
-        <rect class="slot" x="762" y="322" width="22" height="10" rx="1" />
-        <rect class="slot" x="790" y="322" width="22" height="10" rx="1" />
+        <!-- Near consolidation hub (waist) -->
+        <rect class="slot" x="248" y="440" width="20" height="9" rx="1" />
+        <rect class="slot" x="272" y="440" width="20" height="9" rx="1" />
+        <rect class="slot" x="296" y="440" width="20" height="9" rx="1" />
+        <rect class="slot" x="248" y="454" width="20" height="9" rx="1" />
+        <rect class="slot" x="272" y="454" width="20" height="9" rx="1" />
+        <rect class="slot" x="296" y="454" width="20" height="9" rx="1" />
+
+        <!-- Near dist-N hub -->
+        <rect class="slot" x="334" y="672" width="20" height="9" rx="1" />
+        <rect class="slot" x="358" y="672" width="20" height="9" rx="1" />
+        <rect class="slot" x="382" y="672" width="20" height="9" rx="1" />
+        <rect class="slot" x="334" y="686" width="20" height="9" rx="1" />
+        <rect class="slot" x="358" y="686" width="20" height="9" rx="1" />
+
+        <!-- ═══ LOCATION CODES (LATAM 3-letter) ═══ -->
+        <!-- Origins -->
+        <text class="location-code" x="55" y="100">GYE</text>
+        <text class="location-code" x="150" y="80">UIO</text>
+        <text class="location-code" x="220" y="122">BOG</text>
+        <text class="location-code" x="310" y="90">MDE</text>
+        <text class="location-code" x="390" y="130">CLO</text>
+        <!-- Collection / consolidation -->
+        <text class="location-code" x="140" y="290">CTG</text>
+        <text class="location-code" x="320" y="360">PTY</text>
+        <text class="location-code" x="220" y="480">MIA</text>
+        <!-- Distribution -->
+        <text class="location-code" x="130" y="620">VCP</text>
+        <text class="location-code" x="310" y="680">GIG</text>
+        <!-- Destinations -->
+        <text class="location-code" x="60" y="900">SCL</text>
+        <text class="location-code" x="160" y="920">LIM</text>
+        <text class="location-code" x="220" y="880">MVD</text>
+        <text class="location-code" x="300" y="920">EZE</text>
+        <text class="location-code" x="380" y="900">GRU</text>
+
+        <!-- ═══ REFERENCE NUMBERS in whitespace ═══ -->
+        <text class="ref-number" x="42" y="180">045-84291763</text>
+        <text class="ref-number" x="340" y="240">MSCU4821903</text>
+        <text class="ref-number" x="42" y="410">LCL &gt; FCL</text>
+        <text class="ref-number" x="320" y="550">FOB CTG</text>
+        <text class="ref-number" x="42" y="720">DDP MEX</text>
+        <text class="ref-number" x="340" y="850">40HC</text>
+
+        <!-- ═══ MANIFEST TABLE ═══ -->
+        <g class="manifest-rows">
+          <line x1="42" y1="550" x2="150" y2="550" />
+          <line x1="42" y1="558" x2="150" y2="558" />
+          <line x1="42" y1="566" x2="150" y2="566" />
+          <line x1="42" y1="574" x2="150" y2="574" />
+          <line x1="42" y1="582" x2="150" y2="582" />
+          <line x1="42" y1="590" x2="150" y2="590" />
+          <!-- Column dividers -->
+          <line x1="80" y1="548" x2="80" y2="592" stroke-dasharray="2 2" />
+          <line x1="118" y1="548" x2="118" y2="592" stroke-dasharray="2 2" />
+        </g>
+
+        <!-- ═══ HANDLING MARK — this side up ═══ -->
+        <g class="handling-mark">
+          <polygon points="370,140 385,120 400,140" />
+          <line x1="366" y1="144" x2="404" y2="144" />
+        </g>
       </svg>
     </div>
   </div>
 
   <div
-    class="hero-content relative z-10 mx-auto grid w-full max-w-7xl items-center gap-y-6 pt-[clamp(52px,7vw,80px)] lg:grid-cols-12 lg:gap-x-8 lg:gap-y-0"
+    class="hero-content relative z-10 mx-auto grid w-full max-w-7xl items-center gap-y-6 lg:grid-cols-12 lg:gap-x-8 lg:gap-y-0"
   >
     <!-- Left column: narrative -->
-    <div class="lg:col-span-7">
-      <div use:reveal class="hero-kicker-block mb-3" data-reveal>
+    <div class="flex flex-col lg:col-span-7">
+      <div use:reveal class="hero-doc-ref-strip mb-6" data-reveal aria-hidden="true">
+        <span class="hero-doc-ref-id">EREA / LOGISTICS</span>
+        <span class="hero-doc-ref-dash">—</span>
+        <span class="hero-doc-ref-class">PRACTICE BRIEF</span>
+        <span class="hero-doc-ref-date">{new Date().getFullYear()}</span>
+      </div>
+
+      <div use:reveal class="hero-kicker-block mb-5" data-reveal>
         <div class="hero-kicker-row">
           <span class="hero-kicker-rule" aria-hidden="true"></span>
-          <p class="eyebrow mb-0 font-semibold">{t.hero.kicker}</p>
+          <p class="hero-brand-name mb-0">{t.hero.kicker}</p>
         </div>
         <p class="hero-kicker-sub">{t.hero.kickerSub}</p>
       </div>
 
       <h1
         use:reveal={{ y: 28 }}
-        class="hero-title mb-4 max-w-[18ch] font-serif tracking-tight text-text-primary"
+        class="hero-title mb-6 max-w-[26ch] font-serif font-bold text-text-primary"
         data-reveal
       >
         {t.hero.title}
@@ -204,7 +385,7 @@
 
       <p
         use:reveal={{ delay: 0.08 }}
-        class="hero-subtitle mb-5 max-w-[32rem] text-text-secondary"
+        class="hero-subtitle mb-8 max-w-[32rem] text-text-secondary"
         data-reveal
       >
         {t.hero.subtitle}
@@ -212,7 +393,7 @@
 
       <div
         use:reveal={{ delay: 0.14 }}
-        class="mb-4 flex flex-wrap items-center gap-x-6 gap-y-3"
+        class="mb-6 flex flex-wrap items-center gap-x-6 gap-y-3"
         data-reveal
       >
         <a
@@ -221,8 +402,9 @@
             e.preventDefault();
             scrollToSection('contact');
           }}
-          class="button-primary lift-on-hover"
+          class="hero-cta-primary"
         >
+          <span class="hero-cta-ref" aria-hidden="true">OPS</span>
           {t.hero.ctaPrimary}
           <span class="hero-cta-arrow" aria-hidden="true">→</span>
         </a>
@@ -239,9 +421,14 @@
         </a>
       </div>
 
-      <div use:reveal={{ delay: 0.2 }} class="hero-pills" data-reveal>
-        {#each t.hero.notePills as pill}
-          <span class="hero-pill">{pill}</span>
+      <div use:reveal={{ delay: 0.2 }} class="hero-manifest-strip mt-4" data-reveal>
+        <span class="hero-manifest-strip-label" aria-hidden="true">ROUTING</span>
+        <span class="hero-manifest-strip-rule" aria-hidden="true"></span>
+        {#each t.hero.notePills as pill, i}
+          <span class="hero-manifest-strip-item">
+            <span class="hero-manifest-strip-code" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            {pill}
+          </span>
         {/each}
       </div>
     </div>
@@ -249,14 +436,22 @@
     <!-- Right column: metrics manifest panel -->
     <div
       use:stagger={{ selector: '.hero-proof-stat', stagger: 0.08, y: 20 }}
-      class="hero-proof-band lg:col-span-5 lg:row-start-1 lg:col-start-8"
+      class="hero-proof-band lg:col-span-5 lg:row-start-1 lg:col-start-8 lg:self-start lg:mt-4"
       role="region"
       aria-label="Indicadores de impacto"
     >
       <div class="hero-proof-header">
         <span class="hero-proof-header-title">{t.hero.statusBadge}</span>
         <span class="hero-proof-header-ref" aria-hidden="true">REF: ELS-{new Date().getFullYear()}</span>
-        <span class="hero-proof-header-dot" aria-hidden="true"></span>
+        <span class="hero-proof-header-class" aria-hidden="true">FIELD DATA</span>
+      </div>
+
+      <div class="hero-proof-meta" aria-hidden="true">
+        <span class="hero-proof-meta-field">DOC: OPS-RPT-{new Date().getFullYear()}-Q1</span>
+        <span class="hero-proof-meta-sep">|</span>
+        <span class="hero-proof-meta-field">CLASS: OPERATIONAL</span>
+        <span class="hero-proof-meta-sep">|</span>
+        <span class="hero-proof-meta-field">REV: 04</span>
       </div>
 
       <div class="hero-proof-grid">
@@ -266,6 +461,7 @@
             <div class="hero-proof-field-head">
               <span class="hero-proof-ref" aria-hidden="true">KPI-0{i + 1}</span>
               <span class="hero-proof-label">{stat.label}</span>
+              <span class="hero-proof-field-reg" aria-hidden="true">§{i + 1}.{(i + 1) * 2}</span>
             </div>
             <div class="hero-proof-value-row">
               <svg class="hero-proof-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -295,6 +491,7 @@
           {/each}
         </div>
         <p class="hero-proof-note">{t.hero.cardNote}</p>
+        <span class="hero-proof-page" aria-hidden="true">1/1</span>
       </div>
     </div>
   </div>
@@ -326,22 +523,31 @@
 
   .hero-kicker-rule {
     width: 2.4rem;
-    height: 1.2px;
-    background: var(--color-brand-36);
+    height: 1.5px;
+    background: var(--color-brand-42);
+  }
+
+  .hero-brand-name {
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent-deep);
+    line-height: 1;
   }
 
   .hero-kicker-sub {
     margin: 0;
     padding-left: calc(2.4rem + 0.75rem);
-    font-size: 0.78rem;
-    color: var(--color-text-tertiary);
+    font-size: 0.84rem;
+    color: var(--color-text-secondary);
     line-height: 1.3;
   }
 
   /* ── Headline ── */
   .hero-title {
-    font-size: clamp(2.4rem, 4.2vw, 3.6rem);
-    line-height: 1.04;
+    font-size: clamp(2.4rem, 4vw, 3.5rem);
+    line-height: 1.08;
     letter-spacing: -0.02em;
     text-wrap: balance;
   }
@@ -353,39 +559,111 @@
     letter-spacing: -0.008em;
   }
 
-  /* ── Attribute pills ── */
-  .hero-pills {
+  /* ── Manifest routing strip ── */
+  .hero-manifest-strip {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 0;
+    border-top: 1px solid var(--color-brand-14);
+    border-bottom: 1px solid var(--color-brand-14);
+    padding: 0.4rem 0;
   }
 
-  .hero-pill {
+  .hero-manifest-strip-label {
+    font-family: var(--font-sans);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--color-brand-28);
+    text-transform: uppercase;
+    flex-shrink: 0;
+    padding-right: 0.6rem;
+  }
+
+  .hero-manifest-strip-rule {
+    width: 1px;
+    height: 18px;
+    background: var(--color-brand-16);
+    flex-shrink: 0;
+  }
+
+  .hero-manifest-strip-item {
     display: inline-flex;
     align-items: center;
-    padding: 0.3rem 0.7rem;
-    font-size: 0.68rem;
+    gap: 0.3rem;
+    padding: 0.15rem 0.65rem;
+    font-size: 0.72rem;
     font-weight: 600;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--color-accent-deep);
-    border: 1px solid var(--color-brand-14);
-    background: var(--color-brand-3);
+    color: var(--color-text-secondary);
+    border-right: 1px solid var(--color-brand-10);
     line-height: 1;
   }
 
-  /* ── CTA arrow ── */
+  .hero-manifest-strip-item:last-child {
+    border-right: none;
+  }
+
+  .hero-manifest-strip-code {
+    font-family: var(--font-sans);
+    font-size: 0.56rem;
+    font-weight: 700;
+    color: var(--color-brand-36);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Hero CTA — document action ── */
+  .hero-cta-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem 0.55rem 0;
+    font-size: 0.92rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--color-bg-card);
+    background: var(--color-accent-deep);
+    border: none;
+    border-left: 3.5px solid var(--color-accent);
+    text-decoration: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .hero-cta-ref {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55rem 0.5rem;
+    margin-right: 0.15rem;
+    font-size: 0.52rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--color-accent);
+    background: rgba(255, 255, 255, 0.08);
+    align-self: stretch;
+  }
+
+  .hero-cta-primary:hover {
+    background: var(--color-gradient-deep);
+    border-left-color: var(--color-accent-soft);
+  }
+
+  .hero-cta-primary:active {
+    background: var(--color-accent-deep);
+  }
+
   .hero-cta-arrow {
     display: inline-block;
     transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
   }
 
-  :global(.button-primary:hover) .hero-cta-arrow {
-    transform: translateX(4px);
+  .hero-cta-primary:hover .hero-cta-arrow {
+    transform: translateX(3px);
   }
 
-  :global(.button-primary:active) .hero-cta-arrow {
-    transform: translateX(2px);
+  .hero-cta-primary:active .hero-cta-arrow {
+    transform: translateX(1px);
   }
 
   /* ── Secondary link ── */
@@ -419,12 +697,15 @@
   /* ── Blueprint SVG ── */
   .hero-blueprint-field {
     position: absolute;
-    top: clamp(40px, 8vh, 100px);
-    left: 28%;
-    width: min(42vw, 560px);
-    height: clamp(300px, 40vw, 440px);
-    opacity: 0.9;
-    mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.5) 15%, rgba(0, 0, 0, 0.8) 40%, rgba(0, 0, 0, 0.5) 75%, transparent 100%);
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(48vw, 580px);
+    height: 100%;
+    opacity: 1;
+    mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.3) 18%, rgba(0, 0, 0, 0.65) 38%, rgba(0, 0, 0, 0.65) 62%, rgba(0, 0, 0, 0.3) 82%, transparent 100%),
+      linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 8%, rgba(0, 0, 0, 0.85) 25%, rgba(0, 0, 0, 0.85) 75%, rgba(0, 0, 0, 0.5) 92%, transparent 100%);
+    mask-composite: intersect;
   }
 
   .hero-blueprint-grid,
@@ -436,10 +717,10 @@
 
   .hero-blueprint-grid {
     background-image:
-      linear-gradient(rgba(var(--color-brand-rgb), 0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(var(--color-brand-rgb), 0.035) 1px, transparent 1px);
+      linear-gradient(rgba(var(--color-brand-rgb), 0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(var(--color-brand-rgb), 0.055) 1px, transparent 1px);
     background-size: 36px 36px;
-    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.72) 66%, transparent 100%);
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.78) 66%, transparent 100%);
   }
 
   .hero-blueprint-frame::before,
@@ -512,9 +793,136 @@
   .hero-blueprint-map .hub-label {
     font-family: var(--font-sans);
     font-size: 9px;
+    font-weight: 600;
     text-transform: uppercase;
-    fill: rgba(var(--color-brand-rgb), 0.30);
+    fill: rgba(var(--color-brand-rgb), 0.40);
     text-anchor: middle;
+  }
+
+  .hero-blueprint-map .location-code {
+    font-family: var(--font-sans);
+    font-size: 7.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    fill: rgba(var(--color-brand-rgb), 0.34);
+    text-anchor: middle;
+  }
+
+  .hero-blueprint-map .ref-number {
+    font-family: var(--font-sans);
+    font-size: 7px;
+    letter-spacing: 0.04em;
+    fill: rgba(var(--color-brand-rgb), 0.24);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hero-blueprint-map .manifest-rows line {
+    stroke: rgba(var(--color-brand-rgb), 0.18);
+    stroke-width: 0.75;
+  }
+
+  .hero-blueprint-map .handling-mark polygon {
+    fill: none;
+    stroke: rgba(var(--color-brand-rgb), 0.22);
+    stroke-width: 1.2;
+  }
+
+  .hero-blueprint-map .handling-mark line {
+    stroke: rgba(var(--color-brand-rgb), 0.22);
+    stroke-width: 1.2;
+  }
+
+  /* ── Document margin signals ── */
+  .hero-doc-margin {
+    position: absolute;
+    left: clamp(8px, 1.5vw, 20px);
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .hero-doc-margin-mark {
+    position: absolute;
+    left: 0;
+    width: 8px;
+    height: 1px;
+    background: var(--color-brand-22);
+  }
+
+  .hero-doc-margin-top {
+    top: 18%;
+  }
+
+  .hero-doc-margin-mid {
+    top: 50%;
+  }
+
+  .hero-doc-margin-bot {
+    top: 82%;
+  }
+
+  .hero-doc-fold {
+    position: absolute;
+    right: auto;
+    left: 0;
+    top: 50%;
+    width: 1px;
+    height: 24px;
+    transform: translateY(-50%);
+    background: var(--color-brand-28);
+  }
+
+  .hero-doc-fold::before {
+    content: '⊢';
+    position: absolute;
+    top: 50%;
+    left: 4px;
+    transform: translateY(-50%);
+    font-size: 0.5rem;
+    color: var(--color-brand-22);
+  }
+
+  /* ── Document reference strip ── */
+  .hero-doc-ref-strip {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .hero-doc-ref-id {
+    font-family: var(--font-sans);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--color-brand-36);
+    text-transform: uppercase;
+  }
+
+  .hero-doc-ref-dash {
+    font-size: 0.56rem;
+    color: var(--color-brand-16);
+  }
+
+  .hero-doc-ref-class {
+    font-family: var(--font-sans);
+    font-size: 0.56rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--color-brand-28);
+    text-transform: uppercase;
+  }
+
+  .hero-doc-ref-date {
+    font-family: var(--font-sans);
+    font-size: 0.56rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--color-brand-22);
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
   }
 
   /* ── Hero section layout ── */
@@ -522,10 +930,12 @@
     min-height: 100svh;
     display: flex;
     flex-direction: column;
+    padding-top: clamp(48px, 5vw, 64px);
   }
 
   .hero-content {
     flex: 1;
+    align-content: center;
   }
 
   /* ── Metrics manifest panel ── */
@@ -533,43 +943,45 @@
     background: var(--color-bg-card);
     border: 1.5px solid var(--color-brand-22);
     position: relative;
-    align-self: center;
     z-index: 2;
   }
 
-  /* Corner crop marks — document registration */
+  /* Corner crop marks — document registration (asymmetric) */
   .hero-proof-band::before,
   .hero-proof-band::after {
     content: '';
     position: absolute;
-    width: 20px;
-    height: 20px;
     pointer-events: none;
     z-index: 1;
   }
 
   .hero-proof-band::before {
-    top: -6px;
-    left: -6px;
-    border-top: 2px solid var(--color-brand-36);
-    border-left: 2px solid var(--color-brand-36);
+    top: -8px;
+    left: -8px;
+    width: 24px;
+    height: 24px;
+    border-top: 2px solid var(--color-brand-42);
+    border-left: 2px solid var(--color-brand-42);
   }
 
   .hero-proof-band::after {
-    bottom: -6px;
-    right: -6px;
-    border-bottom: 2px solid var(--color-brand-36);
-    border-right: 2px solid var(--color-brand-36);
+    bottom: -5px;
+    right: -5px;
+    width: 14px;
+    height: 14px;
+    border-bottom: 1.5px solid var(--color-brand-28);
+    border-right: 1.5px solid var(--color-brand-28);
   }
 
-  /* Dark teal header — like a real document header */
+  /* Stamped document header */
   .hero-proof-header {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.55rem 1rem;
-    background: var(--color-accent-deep);
-    border-bottom: 2px solid var(--color-accent);
+    padding: 0.65rem 1rem;
+    background: var(--color-brand-5);
+    border-top: 2px solid var(--color-brand-36);
+    border-bottom: 1.5px solid var(--color-brand-22);
   }
 
   .hero-proof-header-title {
@@ -577,39 +989,50 @@
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.92);
+    color: var(--color-accent-deep);
   }
 
   .hero-proof-header-ref {
     font-size: 0.56rem;
     font-weight: 600;
     letter-spacing: 0.08em;
-    color: rgba(255, 255, 255, 0.45);
+    color: var(--color-brand-36);
     font-variant-numeric: tabular-nums;
   }
 
-  .hero-proof-header-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--color-accent);
+  .hero-proof-header-class {
     margin-left: auto;
-    position: relative;
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent-deep);
+    border: 1px solid var(--color-brand-28);
+    padding: 0.1rem 0.4rem;
+    line-height: 1.3;
   }
 
-  .hero-proof-header-dot::after {
-    content: '';
-    position: absolute;
-    inset: -3px;
-    border-radius: 50%;
-    border: 1.5px solid var(--color-accent);
-    animation: ping-ring 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+  .hero-proof-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 1rem;
+    border-bottom: 1px dashed var(--color-brand-14);
+    background: var(--color-brand-3);
   }
 
-  @keyframes ping-ring {
-    0% { transform: scale(0.8); opacity: 0.8; }
-    70% { transform: scale(2.2); opacity: 0; }
-    100% { transform: scale(2.2); opacity: 0; }
+  .hero-proof-meta-field {
+    font-family: var(--font-sans);
+    font-size: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--color-brand-36);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hero-proof-meta-sep {
+    font-size: 0.5rem;
+    color: var(--color-brand-16);
   }
 
   .hero-proof-grid {
@@ -620,8 +1043,8 @@
 
   .hero-proof-stat {
     position: relative;
-    padding: 0.75rem 1rem 0.8rem;
-    min-height: 5.4rem;
+    padding: 1rem 1rem 1.1rem;
+    min-height: 7rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -648,7 +1071,7 @@
     display: flex;
     align-items: baseline;
     gap: 0.5rem;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.45rem;
   }
 
   .hero-proof-ref {
@@ -672,9 +1095,19 @@
     line-height: 1.3;
   }
 
+  .hero-proof-field-reg {
+    font-family: var(--font-sans);
+    font-size: 0.48rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--color-brand-22);
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+  }
+
   .hero-proof-value-row {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 0.35rem;
   }
 
@@ -698,7 +1131,7 @@
 
   .hero-proof-footer {
     border-top: 1.5px solid var(--color-brand-16);
-    padding: 0.5rem 1rem;
+    padding: 0.6rem 1rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -723,18 +1156,29 @@
     font-size: 0.66rem;
     color: var(--color-text-tertiary);
     letter-spacing: 0.01em;
+    flex: 1;
+  }
+
+  .hero-proof-page {
+    font-family: var(--font-sans);
+    font-size: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--color-brand-28);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
   }
 
   /* ── Scroll prompt ── */
   .scroll-prompt {
     display: flex;
     justify-content: center;
-    padding-bottom: clamp(1.2rem, 2.5vh, 2.5rem);
+    padding-bottom: clamp(0.8rem, 1.5vh, 1.5rem);
+    padding-top: clamp(0.5rem, 1vh, 1rem);
     color: var(--color-text-tertiary);
     opacity: 0.6;
     transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     animation: scroll-bob 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-    margin-top: auto;
   }
 
   .scroll-prompt-hidden {
@@ -750,10 +1194,12 @@
   /* ── Responsive ── */
   @media (max-width: 1024px) {
     .hero-blueprint-field {
-      left: 15%;
-      width: min(50vw, 500px);
-      height: clamp(260px, 34vw, 340px);
+      width: min(56vw, 480px);
+      height: 100%;
       opacity: 0.6;
+      mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.25) 15%, rgba(0, 0, 0, 0.55) 35%, rgba(0, 0, 0, 0.55) 65%, rgba(0, 0, 0, 0.25) 85%, transparent 100%),
+        linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 10%, rgba(0, 0, 0, 0.8) 28%, rgba(0, 0, 0, 0.8) 72%, rgba(0, 0, 0, 0.5) 90%, transparent 100%);
+      mask-composite: intersect;
     }
   }
 
@@ -762,13 +1208,36 @@
       min-height: auto;
     }
 
+    .hero-doc-margin {
+      display: none;
+    }
+
+    .hero-manifest-strip {
+      flex-wrap: wrap;
+      gap: 0.2rem;
+    }
+
+    .hero-manifest-strip-rule {
+      display: none;
+    }
+
+    .hero-manifest-strip-item {
+      border-right: none;
+      padding: 0.15rem 0.4rem;
+    }
+
+    .hero-doc-ref-date {
+      margin-left: 0;
+    }
+
     .hero-blueprint-field {
-      top: 4.5rem;
-      left: -5%;
-      width: 85vw;
-      height: 220px;
+      top: 0;
+      width: 70vw;
+      height: 100%;
       opacity: 0.25;
-      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%);
+      mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.3) 20%, rgba(0, 0, 0, 0.5) 40%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0.3) 80%, transparent 100%),
+        linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 15%, rgba(0, 0, 0, 0.7) 30%, rgba(0, 0, 0, 0.7) 70%, rgba(0, 0, 0, 0.5) 85%, transparent 100%);
+      mask-composite: intersect;
     }
 
     .hero-blueprint-grid {
@@ -790,8 +1259,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .hero-proof-header-dot::after {
-      animation: none;
+    .hero-cta-primary {
+      transition: none;
     }
 
     .hero-cta-arrow {
