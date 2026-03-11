@@ -53,10 +53,6 @@ export function prefersReducedMotion(): boolean {
   return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-export function getLenis(): null {
-  return null;
-}
-
 export function getNavHeight(): number {
   return document.querySelector('nav')?.offsetHeight ?? 80;
 }
@@ -86,8 +82,7 @@ export function snapPassedAnimations() {
   }
 }
 
-export function initSmoothScroll() {}
-export function destroySmoothScroll() {
+export function destroyScrollTriggers() {
   ScrollTrigger.killAll();
 }
 

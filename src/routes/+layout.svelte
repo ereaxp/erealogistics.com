@@ -1,7 +1,7 @@
 <script lang="ts">
   import '../app.css';
   import { onMount } from 'svelte';
-  import { initSmoothScroll, destroySmoothScroll } from '$lib/animations/gsap';
+  import { destroyScrollTriggers } from '$lib/animations/gsap';
   import { lang, getContent } from '$lib/stores/lang.svelte';
   import { base } from '$app/paths';
   import Toast from '$lib/components/ui/Toast.svelte';
@@ -12,8 +12,7 @@
   let canonical = $derived(`https://erealogistics.com/${lang.current === 'en' ? '?lang=en' : ''}`);
 
   onMount(() => {
-    initSmoothScroll();
-    return () => destroySmoothScroll();
+    return () => destroyScrollTriggers();
   });
 </script>
 

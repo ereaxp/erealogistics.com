@@ -2,12 +2,13 @@
   import { onMount } from 'svelte';
   import { getContent } from '$lib/stores/lang.svelte';
   import { reveal, stagger, countUp } from '$lib/animations/actions';
-  import { scrollToSection, prefersReducedMotion } from '$lib/animations/gsap';
+  import { scrollToSection, prefersReducedMotion, STAGGER } from '$lib/animations/gsap';
   import { gsap } from 'gsap';
 
   let t = $derived(getContent());
   let blueprintSvg: SVGSVGElement;
   let scrollPromptVisible = $state(true);
+  const currentYear = new Date().getFullYear();
 
   function handleScroll() {
     if (scrollPromptVisible && window.scrollY > 80) {
@@ -45,15 +46,11 @@
 
     routesIn.forEach(setDashHidden);
     routesOut.forEach(setDashHidden);
-    lanes.forEach(el => setDashHidden(el));
+    lanes.forEach(setDashHidden);
 
-    gsap.set([hubsOrigin, hubCentral, hubsDestination], { scale: 0, transformOrigin: 'center center' });
-    gsap.set(nodes, { scale: 0, transformOrigin: 'center center' });
+    gsap.set([hubsOrigin, hubCentral, hubsDestination, nodes], { scale: 0, transformOrigin: 'center center' });
     gsap.set(labels, { opacity: 0, y: 4 });
-    gsap.set(locationCodes, { opacity: 0 });
-    gsap.set(refNumbers, { opacity: 0 });
-    gsap.set(manifestRows, { opacity: 0 });
-    gsap.set(handlingMark, { opacity: 0 });
+    gsap.set([locationCodes, refNumbers, manifestRows, handlingMark], { opacity: 0 });
 
     const tl = gsap.timeline({ delay: 0.5 });
 
@@ -61,14 +58,14 @@
     tl.to(hubsOrigin, {
       scale: 1,
       duration: 0.35,
-      stagger: 0.06,
+      stagger: STAGGER.tight,
       ease: 'back.out(1.8)',
     });
 
     tl.to(routesIn, {
       strokeDashoffset: 0,
       duration: 1.0,
-      stagger: 0.12,
+      stagger: STAGGER.loose,
       ease: 'power2.inOut',
     }, '-=0.15');
 
@@ -83,14 +80,14 @@
     tl.to(routesOut, {
       strokeDashoffset: 0,
       duration: 1.0,
-      stagger: 0.12,
+      stagger: STAGGER.loose,
       ease: 'power2.inOut',
     }, '-=0.15');
 
     tl.to(hubsDestination, {
       scale: 1,
       duration: 0.35,
-      stagger: 0.06,
+      stagger: STAGGER.tight,
       ease: 'back.out(1.8)',
     }, '-=0.4');
 
@@ -364,7 +361,7 @@
         <span class="hero-doc-ref-id">EREA / LOGISTICS</span>
         <span class="hero-doc-ref-dash">—</span>
         <span class="hero-doc-ref-class">PRACTICE BRIEF</span>
-        <span class="hero-doc-ref-date">{new Date().getFullYear()}</span>
+        <span class="hero-doc-ref-date">{currentYear}</span>
       </div>
 
       <div use:reveal class="hero-kicker-block mb-5" data-reveal>
@@ -442,12 +439,12 @@
     >
       <div class="hero-proof-header">
         <span class="hero-proof-header-title">{t.hero.statusBadge}</span>
-        <span class="hero-proof-header-ref" aria-hidden="true">REF: ELS-{new Date().getFullYear()}</span>
+        <span class="hero-proof-header-ref" aria-hidden="true">REF: ELS-{currentYear}</span>
         <span class="hero-proof-header-class" aria-hidden="true">FIELD DATA</span>
       </div>
 
       <div class="hero-proof-meta" aria-hidden="true">
-        <span class="hero-proof-meta-field">DOC: OPS-RPT-{new Date().getFullYear()}-Q1</span>
+        <span class="hero-proof-meta-field">DOC: OPS-RPT-{currentYear}-Q1</span>
         <span class="hero-proof-meta-sep">|</span>
         <span class="hero-proof-meta-field">CLASS: OPERATIONAL</span>
         <span class="hero-proof-meta-sep">|</span>
