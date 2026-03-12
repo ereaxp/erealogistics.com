@@ -24,7 +24,6 @@ No test runner is configured.
 - **SvelteKit 2** (Svelte 5 with runes) + `adapter-static` for fully prerendered output
 - **Tailwind CSS v4** via `@tailwindcss/vite` plugin — config lives in `src/app.css` using `@theme` and `@utility` directives (no `tailwind.config`)
 - **GSAP + ScrollTrigger** for scroll-driven animations
-- **Lenis** for smooth scrolling
 - **TypeScript** with strict mode
 
 ## Architecture
@@ -52,7 +51,7 @@ The site is a single route (`src/routes/+page.svelte`) with section-based naviga
 - **Always use CSS custom properties** (`var(--color-*)`) — never inline hex colors
 
 ### Build optimizations
-Manual chunks in `vite.config.ts` split `three`, `gsap`, and `lenis` into separate bundles.
+Manual chunks in `vite.config.ts` split `gsap` into a separate bundle.
 
 ### Fonts
 Custom fonts (Equity serif, Concourse sans-serif) served from `static/fonts/` as woff2.

@@ -97,7 +97,7 @@
 <Nav bind:mobileOpen />
 <ShipmentTracker />
 
-<main id="main" inert={mobileOpen || undefined} aria-hidden={mobileOpen || undefined}>
+<main id="main" inert={mobileOpen || undefined}>
   <Hero />
 
   <div class="route-connector" aria-hidden="true" bind:this={routeConnectors[0]}>
@@ -160,10 +160,10 @@
         </div>
         {#each t.value.items as item, i}
           <div class="value-field" role="row">
-            <span class="value-field-ref" role="cell" aria-hidden="true" lang="en">CAP-0{i + 1}</span>
+            <span class="value-field-ref" aria-hidden="true" lang="en">CAP-0{i + 1}</span>
             <div role="cell"><h3 class="value-field-title">{item.title}</h3></div>
             <div role="cell"><p class="value-field-scope text-text-secondary">{item.text}</p></div>
-            <span class="value-field-status" role="cell" aria-hidden="true" lang="en">ACTIVE</span>
+            <span class="value-field-status" aria-hidden="true" lang="en">ACTIVE</span>
           </div>
         {/each}
         <div class="value-manifest-footer" aria-hidden="true" lang="en">
@@ -953,13 +953,16 @@
     font-weight: 600;
     color: var(--color-bg-card);
     background: var(--color-accent-deep);
+    border: none;
     border-radius: 4px;
     text-decoration: none;
     transition: background-color 0.15s ease;
   }
 
-  .contact-send-btn:hover:not(:disabled) {
-    background: var(--color-gradient-deep);
+  @media (hover: hover) {
+    .contact-send-btn:hover:not(:disabled) {
+      background: var(--color-gradient-deep);
+    }
   }
 
   .contact-send-btn:disabled {
@@ -975,9 +978,11 @@
     transition: color 0.15s ease, border-color 0.15s ease;
   }
 
-  .contact-email-fallback:hover {
-    color: var(--color-accent-deep);
-    border-color: var(--color-accent-deep);
+  @media (hover: hover) {
+    .contact-email-fallback:hover {
+      color: var(--color-accent-deep);
+      border-color: var(--color-accent-deep);
+    }
   }
 
   /* ── Contact form document ── */
