@@ -34,8 +34,8 @@ function init() {
       ScrollTrigger.create({
         trigger: heroEl,
         start: 'bottom 20%',
-        onEnterBack: () => { visible = false; },
-        onLeave: () => { visible = true; },
+        onEnterBack: () => { if (visible) visible = false; },
+        onLeave: () => { if (!visible) visible = true; },
       })
     );
   }
@@ -45,8 +45,8 @@ function init() {
       ScrollTrigger.create({
         trigger: footerEl,
         start: 'top 90%',
-        onEnter: () => { visible = false; },
-        onLeaveBack: () => { visible = true; },
+        onEnter: () => { if (visible) visible = false; },
+        onLeaveBack: () => { if (!visible) visible = true; },
       })
     );
   }
@@ -62,8 +62,8 @@ function init() {
         trigger: el,
         start: 'top 50%',
         end: 'bottom 50%',
-        onEnter: () => { activeIndex = i; },
-        onEnterBack: () => { activeIndex = i; },
+        onEnter: () => { if (activeIndex !== i) activeIndex = i; },
+        onEnterBack: () => { if (activeIndex !== i) activeIndex = i; },
       })
     );
   });

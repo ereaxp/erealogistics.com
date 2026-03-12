@@ -1,23 +1,27 @@
 <script lang="ts">
   import { lang, getContent } from '$lib/stores/lang.svelte';
   import { scrollToSection } from '$lib/animations/gsap';
+  import { sectionTracker } from '$lib/stores/sectionTracker.svelte';
   import BrandMark from './BrandMark.svelte';
 
   let { mobileOpen = $bindable(false) } = $props();
 
   let t = $derived(getContent());
   let scrolled = $state(false);
-  let activeSection = $state('');
 
-  const sections = [
-    { id: 'about', key: 'about' as const },
-    { id: 'methodology', key: 'value' as const },
-    { id: 'transformation', key: 'transformation' as const },
-    { id: 'impact', key: 'impact' as const },
-    { id: 'questions', key: 'questions' as const },
-    { id: 'team', key: 'team' as const },
-    { id: 'contact', key: 'contact' as const }
-  ];
+  // Map section IDs to nav content keys (only where they differ)
+  const navKeyOverrides: Record<string, string> = {
+    methodology: 'value',
+  };
+
+  const navSections = $derived(
+    sectionTracker.sections.map((s) => ({
+      id: s.id,
+      key: (navKeyOverrides[s.id] ?? s.id) as keyof typeof t.nav,
+    }))
+  );
+
+  let activeSection = $derived(sectionTracker.visible ? sectionTracker.activeSection.id : '');
 
   function handleScroll() {
     const next = window.scrollY > 24;
@@ -26,7 +30,6 @@
 
   function scrollTo(id: string) {
     mobileOpen = false;
-    activeSection = id;
     scrollToSection(id);
   }
 
@@ -63,30 +66,6 @@
       firstLink?.focus();
     }
   });
-
-  $effect(() => {
-    if (typeof document === 'undefined') return;
-    const ids = ['hero', ...sections.map((section) => section.id)];
-    const elements = ids
-      .map((id) => document.getElementById(id))
-      .filter((element): element is HTMLElement => element !== null);
-
-    if (elements.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            activeSection = entry.target.id === 'hero' ? '' : entry.target.id;
-          }
-        }
-      },
-      { threshold: 0, rootMargin: '-12% 0px -55% 0px' }
-    );
-
-    for (const element of elements) observer.observe(element);
-    return () => observer.disconnect();
-  });
 </script>
 
 <svelte:window onscroll={handleScroll} onkeydown={handleKeydown} />
@@ -102,7 +81,7 @@
     </a>
 
     <div class="hidden items-center justify-center gap-3 lg:flex">
-      {#each sections as section}
+      {#each navSections as section}
         <a
           href="#{section.id}"
           onclick={(e) => { e.preventDefault(); scrollTo(section.id); }}
@@ -147,7 +126,7 @@
   >
     <div class="mobile-menu-inner bg-bg-primary" style="border-top: 1px solid var(--color-border-subtle); margin-left: calc(-1 * var(--spacing-container)); margin-right: calc(-1 * var(--spacing-container));">
       <div class="mx-auto flex max-w-7xl flex-col gap-2 px-container py-4">
-        {#each sections as section, i}
+        {#each navSections as section, i}
           <a
             href="#{section.id}"
             onclick={(e) => { e.preventDefault(); scrollTo(section.id); }}
@@ -165,7 +144,7 @@
           onclick={(e) => { e.preventDefault(); scrollTo('contact'); }}
           tabindex={mobileOpen ? 0 : -1}
           class="button-primary mt-2 w-full px-4 py-3 text-center text-sm"
-          style="transition-delay: {mobileOpen ? sections.length * 40 : 0}ms;"
+          style="transition-delay: {mobileOpen ? navSections.length * 40 : 0}ms;"
         >
           {t.nav.cta}
         </a>

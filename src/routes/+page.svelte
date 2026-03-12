@@ -75,8 +75,10 @@
     return tl;
   }
 
+  let auditItemCount = $derived(t.questions.items.length);
   $effect(() => {
-    auditChecked = new Array(t.questions.items.length).fill(false);
+    // Only reset when item count actually changes (not on language switch)
+    auditChecked = new Array(auditItemCount).fill(false);
   });
 
   onMount(() => {
@@ -94,18 +96,22 @@
   });
 </script>
 
+{#snippet routeConnector(index: number)}
+  <div class="route-connector" aria-hidden="true" bind:this={routeConnectors[index]}>
+    <svg class="route-line" viewBox="0 0 2 100" preserveAspectRatio="none">
+      <line x1="1" y1="0" x2="1" y2="100" stroke="var(--color-accent-deep)" stroke-width="1" />
+    </svg>
+    <div class="route-dot"></div>
+  </div>
+{/snippet}
+
 <Nav bind:mobileOpen />
 <ShipmentTracker />
 
 <main id="main" inert={mobileOpen || undefined}>
   <Hero />
 
-  <div class="route-connector" aria-hidden="true" bind:this={routeConnectors[0]}>
-    <svg class="route-line" viewBox="0 0 2 100" preserveAspectRatio="none">
-      <line x1="1" y1="0" x2="1" y2="100" stroke="var(--color-accent-deep)" stroke-width="1" />
-    </svg>
-    <div class="route-dot"></div>
-  </div>
+  {@render routeConnector(0)}
 
   <section id="about" class="px-container py-section-sm text-center" aria-labelledby="about-heading">
     <div class="mx-auto max-w-7xl">
@@ -137,12 +143,7 @@
     </div>
   </section>
 
-  <div class="route-connector" aria-hidden="true" bind:this={routeConnectors[1]}>
-    <svg class="route-line" viewBox="0 0 2 100" preserveAspectRatio="none">
-      <line x1="1" y1="0" x2="1" y2="100" stroke="var(--color-accent-deep)" stroke-width="1" />
-    </svg>
-    <div class="route-dot"></div>
-  </div>
+  {@render routeConnector(1)}
 
   <section id="methodology" class="px-container py-section-sm" aria-labelledby="methodology-heading">
     <div class="mx-auto max-w-7xl">
@@ -169,18 +170,13 @@
         <div class="value-manifest-footer" aria-hidden="true" lang="en">
           <span>DOC: ELS-CAP-{currentYear}</span>
           <span>REV: 02</span>
-          <span>4 OF 4 CAPABILITIES</span>
+          <span>{t.value.items.length} OF {t.value.items.length} CAPABILITIES</span>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="route-connector" aria-hidden="true" bind:this={routeConnectors[2]}>
-    <svg class="route-line" viewBox="0 0 2 100" preserveAspectRatio="none">
-      <line x1="1" y1="0" x2="1" y2="100" stroke="var(--color-accent-deep)" stroke-width="1" />
-    </svg>
-    <div class="route-dot"></div>
-  </div>
+  {@render routeConnector(2)}
 
   <section id="transformation" class="px-container py-section-sm" aria-labelledby="transformation-heading">
     <div class="mx-auto max-w-7xl">

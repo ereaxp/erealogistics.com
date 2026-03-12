@@ -1,106 +1,67 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import { gsap, ScrollTrigger } from '$lib/animations/gsap';
-  import { prefersReducedMotion } from '$lib/animations/gsap';
+  import { gsap, ScrollTrigger, prefersReducedMotion } from '$lib/animations/gsap';
 
   let containerEl: HTMLDivElement;
-  let masterTl: gsap.core.Timeline | undefined;
-  let heroFadeTrigger: ScrollTrigger | undefined;
 
   onMount(() => {
     if (!containerEl) return;
 
-    // Skip all JS on screens where the element is hidden via CSS
-    if (!window.matchMedia('(min-width: 1024px)').matches) return;
+    // Use matchMedia so GSAP auto-kills ScrollTriggers when viewport goes below 1024px
+    ScrollTrigger.matchMedia({
+      '(min-width: 1024px)': () => {
+        if (prefersReducedMotion()) {
+          const allGroups = containerEl.querySelectorAll('[class^="ambient-"]');
+          allGroups.forEach((g) => { gsap.set(g, { opacity: 0 }); });
+          gsap.set(containerEl.querySelector('.ambient-routes'), { opacity: 1 });
+          gsap.set(containerEl.querySelector('.ambient-hubs-central'), { opacity: 1 });
+          gsap.set(containerEl, { opacity: 0.04 });
+          return;
+        }
 
-    if (prefersReducedMotion()) {
-      // Static simplified view: only routes + central hub at 4% opacity
-      const allGroups = containerEl.querySelectorAll('[class^="ambient-"]');
-      allGroups.forEach((g) => {
-        gsap.set(g, { opacity: 0 });
-      });
-      gsap.set(containerEl.querySelector('.ambient-routes'), { opacity: 1 });
-      gsap.set(containerEl.querySelector('.ambient-hubs-central'), { opacity: 1 });
-      gsap.set(containerEl, { opacity: 0.04 });
-      return;
-    }
+        gsap.set(containerEl, { opacity: 0 });
 
-    // Start hidden while hero is in viewport
-    gsap.set(containerEl, { opacity: 0 });
+        ScrollTrigger.create({
+          trigger: '#hero',
+          start: 'bottom top',
+          onEnterBack: () => gsap.to(containerEl, { opacity: 0, duration: 0.4 }),
+          onLeave: () => gsap.to(containerEl, { opacity: 1, duration: 0.6 }),
+        });
 
-    // Fade in when hero exits viewport
-    heroFadeTrigger = ScrollTrigger.create({
-      trigger: '#hero',
-      start: 'bottom top',
-      onEnterBack: () => gsap.to(containerEl, { opacity: 0, duration: 0.4 }),
-      onLeave: () => gsap.to(containerEl, { opacity: 1, duration: 0.6 }),
-    });
+        const ticks = containerEl.querySelector('.ambient-ticks');
+        const manifest = containerEl.querySelector('.ambient-manifest');
+        const refs = containerEl.querySelector('.ambient-refs');
+        const lanes = containerEl.querySelector('.ambient-lanes');
+        const slots = containerEl.querySelector('.ambient-slots');
+        const codes = containerEl.querySelector('.ambient-codes');
+        const nodes = containerEl.querySelector('.ambient-nodes');
+        const routes = containerEl.querySelector('.ambient-routes');
+        const hubsOrigin = containerEl.querySelector('.ambient-hubs-origin');
+        const hubsCentral = containerEl.querySelector('.ambient-hubs-central');
+        const hubsDest = containerEl.querySelector('.ambient-hubs-dest');
 
-    // Progressive simplification timeline
-    const ticks = containerEl.querySelector('.ambient-ticks');
-    const manifest = containerEl.querySelector('.ambient-manifest');
-    const refs = containerEl.querySelector('.ambient-refs');
-    const lanes = containerEl.querySelector('.ambient-lanes');
-    const slots = containerEl.querySelector('.ambient-slots');
-    const codes = containerEl.querySelector('.ambient-codes');
-    const nodes = containerEl.querySelector('.ambient-nodes');
-    const routes = containerEl.querySelector('.ambient-routes');
-    const hubsOrigin = containerEl.querySelector('.ambient-hubs-origin');
-    const hubsCentral = containerEl.querySelector('.ambient-hubs-central');
-    const hubsDest = containerEl.querySelector('.ambient-hubs-dest');
+        const masterTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: 'body',
+            start: () => {
+              const hero = document.getElementById('hero');
+              return hero ? `top+=${hero.offsetHeight}px top` : 'top top';
+            },
+            end: 'bottom bottom',
+            scrub: true,
+          },
+        });
 
-    masterTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: 'body',
-        start: () => {
-          const hero = document.getElementById('hero');
-          return hero ? `top+=${hero.offsetHeight}px top` : 'top top';
-        },
-        end: 'bottom bottom',
-        scrub: true,
+        masterTl.to([ticks, manifest, refs], { opacity: 0, duration: 0.2 }, 0);
+        masterTl.to([lanes, slots], { opacity: 0, duration: 0.2 }, 0.2);
+        masterTl.to([codes, nodes], { opacity: 0, duration: 0.2 }, 0.4);
+        masterTl.to([hubsOrigin, routes], { opacity: 0, duration: 0.2 }, 0.6);
+        masterTl.to(hubsDest, { opacity: 0, duration: 0.15 }, 0.8);
+        masterTl.to(hubsCentral, { opacity: 0.5, duration: 0.2 }, 0.85);
+
+        // matchMedia cleanup: GSAP auto-reverts all ScrollTriggers/tweens created in this scope
       },
     });
-
-    // #methodology start: fade out ticks, manifest, refs (groups 1-3)
-    masterTl.to([ticks, manifest, refs], {
-      opacity: 0,
-      duration: 0.2,
-    }, 0);
-
-    // #transformation start: fade out lanes, slots (groups 4-5)
-    masterTl.to([lanes, slots], {
-      opacity: 0,
-      duration: 0.2,
-    }, 0.2);
-
-    // #impact start: fade out codes, nodes (groups 6-7)
-    masterTl.to([codes, nodes], {
-      opacity: 0,
-      duration: 0.2,
-    }, 0.4);
-
-    // #questions start: fade out origin hubs, simplify routes (groups 9, partially 8)
-    masterTl.to([hubsOrigin, routes], {
-      opacity: 0,
-      duration: 0.2,
-    }, 0.6);
-
-    // #contact start: fade out destination hubs
-    masterTl.to(hubsDest, {
-      opacity: 0,
-      duration: 0.15,
-    }, 0.8);
-
-    // Central hub gets a faint pulse but stays visible
-    masterTl.to(hubsCentral, {
-      opacity: 0.5,
-      duration: 0.2,
-    }, 0.85);
-  });
-
-  onDestroy(() => {
-    if (masterTl) masterTl.kill();
-    if (heroFadeTrigger) heroFadeTrigger.kill();
   });
 </script>
 
