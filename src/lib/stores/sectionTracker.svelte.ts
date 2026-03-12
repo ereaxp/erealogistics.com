@@ -12,9 +12,10 @@ const sections: Section[] = [
   { id: 'methodology', label: 'Value', num: '02', status: 'DESIGNING' },
   { id: 'transformation', label: 'Transform', num: '03', status: 'DESIGNING' },
   { id: 'impact', label: 'Impact', num: '04', status: 'MEASURING' },
-  { id: 'questions', label: 'Audit', num: '05', status: 'IMPLEMENTING' },
-  { id: 'team', label: 'Team', num: '06', status: 'IMPLEMENTING' },
-  { id: 'contact', label: 'Contact', num: '07', status: 'ENGAGING' },
+  { id: 'cases', label: 'Experience', num: '05', status: 'VERIFIED' },
+  { id: 'questions', label: 'Audit', num: '06', status: 'IMPLEMENTING' },
+  { id: 'team', label: 'Team', num: '07', status: 'IMPLEMENTING' },
+  { id: 'contact', label: 'Contact', num: '08', status: 'ENGAGING' },
 ];
 
 let activeIndex = $state(0);

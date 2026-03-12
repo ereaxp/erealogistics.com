@@ -1,6 +1,19 @@
 <script lang="ts">
   import { scrollToSection } from '$lib/animations/gsap';
   import { sectionTracker } from '$lib/stores/sectionTracker.svelte';
+  import { lang, getContent } from '$lib/stores/lang.svelte';
+
+  let t = $derived(getContent());
+
+  // Map section IDs to nav content keys (mirrors Nav.svelte)
+  const navKeyOverrides: Record<string, string> = {
+    methodology: 'value',
+  };
+
+  function navLabel(sectionId: string): string {
+    const key = (navKeyOverrides[sectionId] ?? sectionId) as keyof typeof t.nav;
+    return t.nav[key] ?? sectionId;
+  }
 
   function handleClick(id: string) {
     scrollToSection(id);
@@ -17,7 +30,7 @@
 <nav
   class="tracker"
   class:tracker-visible={sectionTracker.visible}
-  aria-label="Section navigation"
+  aria-label={lang.current === 'es' ? 'Navegación de secciones' : 'Section navigation'}
 >
   <div class="tracker-line" aria-hidden="true"></div>
 
@@ -30,7 +43,7 @@
         class:tracker-node-active={state === 'active'}
         class:tracker-node-pending={state === 'pending'}
         onclick={() => handleClick(section.id)}
-        aria-label="Go to {section.label}"
+        aria-label="{lang.current === 'es' ? 'Ir a' : 'Go to'} {navLabel(section.id)}"
         aria-current={state === 'active' ? 'true' : undefined}
       >
         <span class="tracker-node-dot"></span>

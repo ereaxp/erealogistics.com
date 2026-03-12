@@ -13,6 +13,7 @@
     "value": "Value",
     "transformation": "Transformation",
     "impact": "Impact",
+    "cases": "Experience",
     "questions": "Reflection",
     "team": "Team",
     "contact": "Contact",
@@ -44,7 +45,8 @@
       }
     ],
     "cardNote": "Reference results from LATAM projects.",
-    "statusBadge": "Operations Active"
+    "statusBadge": "Operations Active",
+    "proofLabel": "Impact indicators"
   },
   "about": {
     "label": "ABOUT",

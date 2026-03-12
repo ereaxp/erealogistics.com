@@ -13,6 +13,7 @@
     "value": "Valor",
     "transformation": "Transformación",
     "impact": "Impacto",
+    "cases": "Experiencia",
     "questions": "Reflexión",
     "team": "Equipo",
     "contact": "Contacto",
@@ -44,7 +45,8 @@
       }
     ],
     "cardNote": "Resultados referenciales de proyectos ejecutados en LATAM.",
-    "statusBadge": "Operaciones Activas"
+    "statusBadge": "Operaciones Activas",
+    "proofLabel": "Indicadores de impacto"
   },
   "about": {
     "label": "QUIÉNES SOMOS",

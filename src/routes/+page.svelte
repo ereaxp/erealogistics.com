@@ -8,13 +8,19 @@
 
   import ShipmentTracker from '$lib/components/ShipmentTracker.svelte';
   import ShippingLabel from '$lib/components/ShippingLabel.svelte';
-  import { reveal, stagger } from '$lib/animations/actions';
+  import { reveal, stagger, countUp, lineReveal } from '$lib/animations/actions';
   import { gsap, ScrollTrigger, scrollToSection, prefersReducedMotion } from '$lib/animations/gsap';
   import { toastStore } from '$lib/stores/toast.svelte';
   import { getContent } from '$lib/stores/lang.svelte';
   import { sectionTracker } from '$lib/stores/sectionTracker.svelte';
 
   let t = $derived(getContent());
+
+  function parseStatValue(value: string): { numeric: string; prefix: string; suffix: string } {
+    const match = value.match(/^([+-]?)(\d[\d,.]*)(.*)$/);
+    if (!match) return { numeric: '0', prefix: '', suffix: value };
+    return { numeric: match[2], prefix: match[1], suffix: match[3] };
+  }
   let mobileOpen = $state(false);
   let auditChecked = $state<boolean[]>([]);
   let auditCount = $derived(auditChecked.filter(Boolean).length);
@@ -165,10 +171,10 @@
         </div>
         {#each t.value.items as item, i}
           <div class="value-field" role="row">
-            <span class="value-field-ref" aria-hidden="true" lang="en">CAP-0{i + 1}</span>
+            <div role="cell"><span class="value-field-ref" aria-hidden="true" lang="en">CAP-0{i + 1}</span></div>
             <div role="cell"><h3 class="value-field-title">{item.title}</h3></div>
             <div role="cell"><p class="value-field-scope text-text-secondary">{item.text}</p></div>
-            <span class="value-field-status" aria-hidden="true" lang="en">ACTIVE</span>
+            <div role="cell"><span class="value-field-status" aria-hidden="true" lang="en">ACTIVE</span></div>
           </div>
         {/each}
         <div class="value-manifest-footer" aria-hidden="true" lang="en">
@@ -201,34 +207,58 @@
     </div>
   </section>
 
-  <section id="impact" class="px-container py-section-sm" aria-labelledby="impact-heading">
+  <section id="impact" class="px-container py-section" aria-labelledby="impact-heading">
     <div class="mx-auto max-w-7xl">
       <p class="eyebrow mb-5">{t.impact.label}</p>
       <h2 id="impact-heading" use:reveal class="text-h2 mb-4 font-serif tracking-snug" data-reveal>{t.impact.title}</h2>
-      <p use:reveal={{ delay: 0.08 }} class="text-body-lg text-text-secondary mb-10 max-w-[52rem]" data-reveal>{t.impact.description}</p>
+      <p use:reveal={{ delay: 0.08 }} class="text-body-lg text-text-secondary mb-10" data-reveal>{t.impact.description}</p>
 
-      <div use:stagger={{ selector: '.kpi-cell', stagger: 0.05 }} class="kpi-scorecard">
-        {#each t.impact.items as item, i}
-          <div class="kpi-cell">
-            <span class="kpi-cell-ref" aria-hidden="true" lang="en">KPI-0{i + 1}</span>
-            <div class="kpi-cell-value">{item.value}</div>
-            <p class="kpi-cell-label">{item.text}</p>
-          </div>
-        {/each}
-      </div>
-
-      <div class="mt-14">
-        <p class="eyebrow mb-5">{t.cases.label}</p>
-        <p use:reveal class="text-body-lg text-text-secondary mb-8 max-w-[52rem]" data-reveal>{t.cases.description}</p>
-        <div use:stagger={{ selector: '.case-record', stagger: 0.06 }} class="case-grid">
-          {#each t.cases.items as item}
-            <article class="case-record">
-              <div class="case-record-stat">{item.highlight}</div>
-              <h3 class="case-record-title">{item.title}</h3>
-              <p class="case-record-text text-text-secondary">{item.text}</p>
-            </article>
+      <div class="kpi-report">
+        <div class="kpi-report-header" lang="en">
+          <span class="kpi-report-header-title">PERFORMANCE SUMMARY</span>
+          <span class="kpi-report-header-ref" aria-hidden="true">DOC: ELS-KPI-{currentYear}</span>
+          <span class="kpi-report-pulse" aria-hidden="true"></span>
+        </div>
+        <div use:stagger={{ selector: '.kpi-cell', stagger: 0.05, delay: 0.4 }} class="kpi-scorecard">
+          {#each t.impact.items as item, i}
+            {@const parsed = parseStatValue(item.value)}
+            <div class="kpi-cell">
+              <span class="kpi-cell-ref" aria-hidden="true" lang="en">KPI-0{i + 1}</span>
+              <div class="kpi-cell-value" use:countUp={{ liveTick: true }} data-value={parsed.numeric} data-format="{parsed.prefix}{parsed.suffix}">{item.value}</div>
+              <p class="kpi-cell-label">{item.text}</p>
+            </div>
           {/each}
         </div>
+        <div class="kpi-report-footer" lang="en" aria-hidden="true">
+          <span>DOC: ELS-KPI-{currentYear}</span>
+          <span>REV: 02</span>
+          <span>{t.impact.items.length} OF {t.impact.items.length} METRICS</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  {@render routeConnector(3)}
+
+  <section id="cases" class="cases-section px-container" aria-labelledby="cases-heading">
+    <div class="mx-auto max-w-7xl">
+      <p class="eyebrow mb-2">{t.cases.label}</p>
+      <h2 id="cases-heading" use:reveal class="text-h2 mb-2 font-serif tracking-snug" data-reveal>{t.cases.title}</h2>
+      <p use:reveal={{ delay: 0.08 }} class="text-body-lg text-text-secondary mb-5" data-reveal>{t.cases.description}</p>
+      <div use:stagger={{ selector: '.case-record', stagger: 0.08 }} class="case-ledger">
+        {#each t.cases.items as item, i}
+          <article class="case-record">
+            <div class="case-record-left">
+              <span class="case-record-ref" aria-hidden="true" lang="en">CASE-0{i + 1}</span>
+              <div class="case-record-stat">{item.highlight}</div>
+            </div>
+            <div class="case-record-right">
+              <h3 class="case-record-title">{item.title}</h3>
+              <p class="case-record-text text-text-secondary">{item.text}</p>
+            </div>
+          </article>
+        {/each}
       </div>
     </div>
   </section>
@@ -359,7 +389,7 @@
 
             <label class="mt-3 block text-sm font-medium text-text-primary">
               <span class="mb-1 block">{t.contact.form.messageLabel}</span>
-              <textarea class="min-h-[56px] w-full rounded-[4px] border border-border-subtle bg-bg-card px-3 py-2.5" name="message" placeholder={t.contact.form.messagePlaceholder} maxlength={2000}></textarea>
+              <textarea class="min-h-[56px] w-full resize-y rounded-[4px] border border-border-subtle bg-bg-card px-3 py-2.5" name="message" placeholder={t.contact.form.messagePlaceholder} maxlength={2000}></textarea>
             </label>
 
             <div class="mt-4 flex flex-wrap items-center gap-3">
@@ -440,8 +470,10 @@
     transition: border-color 0.2s ease;
   }
 
-  .about-body-lg :global(a:hover) {
-    border-bottom-color: var(--color-accent-deep);
+  @media (hover: hover) {
+    .about-body-lg :global(a:hover) {
+      border-bottom-color: var(--color-accent-deep);
+    }
   }
 
   .about-body-lg :global(a.external-link)::after {
@@ -453,8 +485,10 @@
     transition: opacity 0.2s ease;
   }
 
-  .about-body-lg :global(a.external-link:hover)::after {
-    opacity: 1;
+  @media (hover: hover) {
+    .about-body-lg :global(a.external-link:hover)::after {
+      opacity: 1;
+    }
   }
 
   .about-body-lg :global(.sr-only) {
@@ -706,12 +740,69 @@
     }
   }
 
-  /* ── KPI scorecard ── */
+  /* ── KPI report document ── */
+  .kpi-report {
+    border: 1px solid var(--color-border-subtle);
+    border-top: 2px solid var(--color-accent-deep);
+  }
+
+  .kpi-report-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
+    background: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .kpi-report-header-title {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-text-primary);
+  }
+
+  .kpi-report-header-ref {
+    font-size: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--color-brand-36);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .kpi-report-pulse {
+    margin-left: auto;
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-accent-deep);
+    animation: kpi-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes kpi-pulse {
+    0%, 100% { opacity: 0.15; }
+    12% { opacity: 0.75; }
+  }
+
+  .kpi-report-footer {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.4rem 1rem;
+    background: var(--color-bg-secondary);
+    border-top: 1px solid var(--color-border-subtle);
+    font-size: 0.48rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--color-brand-28);
+    font-variant-numeric: tabular-nums;
+  }
+
   .kpi-scorecard {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    border-top: 2px solid var(--color-accent-deep);
-    border-left: 1px solid var(--color-brand-10);
   }
 
   @media (min-width: 768px) {
@@ -721,10 +812,24 @@
   }
 
   .kpi-cell {
-    padding: 1.25rem 1rem;
+    padding: 1.5rem 1.25rem;
     border-right: 1px solid var(--color-brand-10);
     border-bottom: 1px solid var(--color-brand-10);
     transition: background-color 0.15s ease;
+  }
+
+  /* Last column: no right border (document frame handles it) */
+  .kpi-cell:nth-child(2n) { border-right: none; }
+  @media (min-width: 768px) {
+    .kpi-cell:nth-child(2n) { border-right: 1px solid var(--color-brand-10); }
+    .kpi-cell:nth-child(3n) { border-right: none; }
+  }
+
+  /* Last row: no bottom border (footer border-top handles it) */
+  .kpi-cell:nth-last-child(-n+2) { border-bottom: none; }
+  @media (min-width: 768px) {
+    .kpi-cell:nth-last-child(-n+2) { border-bottom: 1px solid var(--color-brand-10); }
+    .kpi-cell:nth-last-child(-n+3) { border-bottom: none; }
   }
 
   @media (hover: hover) {
@@ -745,12 +850,16 @@
 
   .kpi-cell-value {
     font-family: var(--font-serif);
-    font-size: clamp(1.8rem, 2.5vw, 2.4rem);
+    font-size: clamp(2.2rem, 3.2vw, 2.8rem);
     font-weight: 700;
     letter-spacing: -0.02em;
     color: var(--color-accent-deep);
     line-height: 1;
     margin-bottom: 0.6rem;
+  }
+
+  .kpi-cell:nth-child(-n+3) .kpi-cell-value {
+    font-size: clamp(2.8rem, 4.5vw, 4.2rem);
   }
 
   .kpi-cell-label {
@@ -759,63 +868,68 @@
     color: var(--color-text-secondary);
   }
 
-  /* ── Case grid ── */
-  .case-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0;
+  /* ── Cases section ── */
+  .cases-section {
+    padding-block: clamp(24px, 3vw, 36px);
+  }
+
+  /* ── Case ledger ── */
+  .case-ledger {
     border-top: 2px solid var(--color-accent-deep);
   }
 
-  @media (min-width: 768px) {
-    .case-grid {
-      grid-template-columns: 1fr 1fr;
-    }
+  .case-record {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px dashed var(--color-brand-14);
   }
 
-  .case-record {
-    padding: 1.25rem 0;
-    border-bottom: 1px dashed var(--color-brand-10);
+  .case-record:last-child {
+    border-bottom: none;
   }
 
   @media (min-width: 768px) {
     .case-record {
-      padding: 1.25rem;
+      grid-template-columns: 0.38fr 0.62fr;
+      gap: 1.5rem;
+      align-items: baseline;
+      padding: 1rem 0;
     }
+  }
 
-    .case-record:nth-child(odd) {
-      padding-left: 0;
-      padding-right: 1.25rem;
-    }
-
-    .case-record:nth-child(even) {
-      border-left: 1px dashed var(--color-brand-10);
-      padding-left: 1.25rem;
-      padding-right: 0;
-    }
+  .case-record-ref {
+    display: block;
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--color-brand-28);
+    margin-bottom: 0.3rem;
+    font-variant-numeric: tabular-nums;
   }
 
   .case-record-stat {
     font-family: var(--font-serif);
-    font-size: clamp(1.1rem, 1.3vw, 1.3rem);
+    font-size: clamp(1.5rem, 2.2vw, 1.95rem);
     font-weight: 700;
     color: var(--color-accent-deep);
     letter-spacing: -0.01em;
-    margin-bottom: 0.4rem;
+    line-height: 1.15;
   }
 
   .case-record-title {
     font-family: var(--font-sans);
-    font-size: clamp(0.95rem, 1vw, 1.05rem);
+    font-size: clamp(1.05rem, 1.15vw, 1.18rem);
     font-weight: 600;
     color: var(--color-text-primary);
     line-height: 1.3;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.25rem;
   }
 
   .case-record-text {
-    font-size: 0.88rem;
-    line-height: 1.5;
+    font-size: clamp(0.92rem, 0.9rem + 0.15vw, 1rem);
+    line-height: 1.55;
   }
 
   /* ── Questions: Audit document ── */
@@ -981,6 +1095,7 @@
   @media (hover: hover) {
     .contact-email-fallback:hover {
       color: var(--color-accent-deep);
+      border-bottom-style: solid;
       border-color: var(--color-accent-deep);
     }
   }
@@ -1089,6 +1204,10 @@
     .route-line line {
       stroke-dasharray: none !important;
       stroke-dashoffset: 0 !important;
+    }
+    .kpi-report-pulse {
+      animation: none;
+      opacity: 0.5;
     }
   }
 </style>

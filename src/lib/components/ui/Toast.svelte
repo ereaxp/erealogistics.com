@@ -83,8 +83,10 @@
     background: none;
     border: none;
   }
-  .toast-dismiss:hover {
-    color: var(--color-text-primary);
+  @media (hover: hover) {
+    .toast-dismiss:hover {
+      color: var(--color-text-primary);
+    }
   }
   @keyframes toast-in {
     from { opacity: 0; transform: translateY(8px); }

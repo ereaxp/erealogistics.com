@@ -19,6 +19,7 @@ import {
   lineReveal as lineRevealFn,
   ambientParallax as ambientParallaxFn,
   countUpOnScroll,
+  prefersReducedMotion,
 } from './gsap';
 
 function destroyTween(tween: ReturnType<typeof revealOnScroll>) {
@@ -43,18 +44,56 @@ export const lineReveal: Action<HTMLElement> = (node) => {
 };
 
 /** Staggered children reveal on scroll. Requires `selector` to target child elements. */
-export const stagger: Action<HTMLElement, { selector: string; stagger?: number; y?: number; onComplete?: () => void }> = (
+export const stagger: Action<HTMLElement, { selector: string; stagger?: number; y?: number; delay?: number; onComplete?: () => void }> = (
   node,
   opts
 ) => {
-  const tween = staggerReveal(node, opts.selector, { stagger: opts.stagger, y: opts.y, onComplete: opts.onComplete });
+  const tween = staggerReveal(node, opts.selector, { stagger: opts.stagger, y: opts.y, delay: opts.delay, onComplete: opts.onComplete });
   return { destroy: () => destroyTween(tween) };
 };
 
-/** Count-up animation for stat values on scroll. */
-export const countUp: Action<HTMLElement> = (node) => {
-  const tween = countUpOnScroll(node);
-  return { destroy: () => destroyTween(tween) };
+/** Count-up animation for stat values on scroll, with optional live-tick readout. */
+export const countUp: Action<HTMLElement, { liveTick?: boolean } | undefined> = (node, opts) => {
+  let tickTimer = 0;
+  let tickAlive = true;
+
+  const onDone = (opts?.liveTick && !prefersReducedMotion()) ? () => {
+    const rawValue = node.getAttribute('data-value') ?? '0';
+    const format = node.getAttribute('data-format') ?? '';
+    const numericStr = rawValue.replace(/[^0-9.]/g, '');
+    const baseVal = Math.round(parseFloat(numericStr) || 0);
+    const pfx = format.startsWith('+') ? '+' : format.startsWith('-') ? '-' : '';
+    const sfx = format.replace(/^[+-]/, '');
+
+    function fmt(val: number): string {
+      const s = val >= 1000 ? val.toLocaleString('en-US') : String(val);
+      return `${pfx}${s}${sfx}`;
+    }
+
+    function schedule() {
+      tickTimer = window.setTimeout(() => {
+        if (!tickAlive) return;
+        node.innerText = fmt(baseVal + (Math.random() > 0.5 ? 1 : -1));
+        tickTimer = window.setTimeout(() => {
+          if (!tickAlive) return;
+          node.innerText = fmt(baseVal);
+          schedule();
+        }, 120 + Math.random() * 130);
+      }, 4000 + Math.random() * 6000);
+    }
+
+    tickTimer = window.setTimeout(schedule, 1500);
+  } : undefined;
+
+  const tween = countUpOnScroll(node, { onDone });
+
+  return {
+    destroy() {
+      tickAlive = false;
+      window.clearTimeout(tickTimer);
+      destroyTween(tween);
+    }
+  };
 };
 
 /** Subtle scroll-driven parallax for ambient viz layers. */

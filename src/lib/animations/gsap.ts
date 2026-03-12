@@ -114,7 +114,7 @@ export function revealOnScroll(el: HTMLElement, opts?: { delay?: number; y?: num
 }
 
 /** Staggered children reveal */
-export function staggerReveal(parent: HTMLElement, childSelector: string, opts?: { stagger?: number; y?: number; onComplete?: () => void }) {
+export function staggerReveal(parent: HTMLElement, childSelector: string, opts?: { stagger?: number; y?: number; delay?: number; onComplete?: () => void }) {
   if (!parent) return null;
   const children = parent.querySelectorAll(childSelector);
 
@@ -131,6 +131,7 @@ export function staggerReveal(parent: HTMLElement, childSelector: string, opts?:
       opacity: 1,
       y: 0,
       duration: DURATION.normal,
+      delay: opts?.delay ?? 0,
       stagger: opts?.stagger ?? STAGGER.loose,
       ease: REVEAL_EASES.body,
       onComplete: opts?.onComplete,
@@ -220,7 +221,7 @@ export function ambientParallax(el: HTMLElement, opts?: { speed?: number; direct
 }
 
 /** Count-up animation for stat values on scroll */
-export function countUpOnScroll(el: HTMLElement) {
+export function countUpOnScroll(el: HTMLElement, opts?: { onDone?: () => void }) {
   if (!el) return null;
 
   const rawValue = el.getAttribute('data-value') ?? '0';
@@ -253,6 +254,7 @@ export function countUpOnScroll(el: HTMLElement) {
     },
     onComplete() {
       el.innerText = `${prefix}${rawValue}${suffix}`;
+      opts?.onDone?.();
     },
   });
 }

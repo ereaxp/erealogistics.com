@@ -628,7 +628,7 @@
       use:stagger={{ selector: '.hero-proof-stat', stagger: 0.08, y: 20 }}
       class="hero-proof-band lg:col-span-5 lg:row-start-1 lg:col-start-8 lg:self-start"
       role="region"
-      aria-label="Indicadores de impacto"
+      aria-label={t.hero.proofLabel}
     >
       <div class="hero-proof-header">
         <span class="hero-proof-header-title">{t.hero.statusBadge}</span>
@@ -719,7 +719,7 @@
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--color-text-primary);
+    color: var(--color-accent-deep);
     line-height: 1;
   }
 
@@ -837,10 +837,12 @@
     align-self: stretch;
   }
 
-  .hero-cta-primary:hover {
-    background: var(--color-gradient-deep);
-    border-left-color: var(--color-white-border-hover);
-    box-shadow: var(--shadow-cta-hover);
+  @media (hover: hover) {
+    .hero-cta-primary:hover {
+      background: var(--color-gradient-deep);
+      border-left-color: var(--color-white-border-hover);
+      box-shadow: var(--shadow-cta-hover);
+    }
   }
 
   .hero-cta-primary:active {
@@ -901,6 +903,8 @@
     width: min(68vw, 860px);
     height: 85%;
     opacity: 1;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.3) 12%, rgba(0, 0, 0, 0.65) 30%, rgba(0, 0, 0, 0.65) 55%, rgba(0, 0, 0, 0.4) 78%, rgba(0, 0, 0, 0.2) 90%, transparent 100%),
+      linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.6) 6%, rgba(0, 0, 0, 0.85) 20%, rgba(0, 0, 0, 0.85) 80%, rgba(0, 0, 0, 0.5) 94%, transparent 100%);
     mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.3) 12%, rgba(0, 0, 0, 0.65) 30%, rgba(0, 0, 0, 0.65) 55%, rgba(0, 0, 0, 0.4) 78%, rgba(0, 0, 0, 0.2) 90%, transparent 100%),
       linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.6) 6%, rgba(0, 0, 0, 0.85) 20%, rgba(0, 0, 0, 0.85) 80%, rgba(0, 0, 0, 0.5) 94%, transparent 100%);
     -webkit-mask-composite: source-in;
@@ -919,6 +923,7 @@
       linear-gradient(rgba(var(--color-brand-rgb), 0.055) 1px, transparent 1px),
       linear-gradient(90deg, rgba(var(--color-brand-rgb), 0.055) 1px, transparent 1px);
     background-size: 36px 36px;
+    -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.78) 66%, transparent 100%);
     mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.78) 66%, transparent 100%);
   }
 
