@@ -803,6 +803,7 @@
   .kpi-scorecard {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    margin-bottom: -1px;
   }
 
   @media (min-width: 768px) {
@@ -818,18 +819,11 @@
     transition: background-color 0.15s ease;
   }
 
-  /* Last column: no right border (document frame handles it) */
+  /* Last column per row: no right border (document frame handles it) */
   .kpi-cell:nth-child(2n) { border-right: none; }
   @media (min-width: 768px) {
     .kpi-cell:nth-child(2n) { border-right: 1px solid var(--color-brand-10); }
     .kpi-cell:nth-child(3n) { border-right: none; }
-  }
-
-  /* Last row: no bottom border (footer border-top handles it) */
-  .kpi-cell:nth-last-child(-n+2) { border-bottom: none; }
-  @media (min-width: 768px) {
-    .kpi-cell:nth-last-child(-n+2) { border-bottom: 1px solid var(--color-brand-10); }
-    .kpi-cell:nth-last-child(-n+3) { border-bottom: none; }
   }
 
   @media (hover: hover) {
