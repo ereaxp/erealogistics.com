@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import { gsap } from '$lib/animations/gsap';
-  import { prefersReducedMotion } from '$lib/animations/gsap';
+  import { gsap, prefersReducedMotion } from '$lib/animations/gsap';
   import { encodeCode128Positioned } from '$lib/utils/barcode';
 
   let { name, company, email, onComplete }: { name: string; company: string; email: string; onComplete: () => void } = $props();

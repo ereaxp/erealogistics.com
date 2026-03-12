@@ -42,8 +42,12 @@
 
     const body = `${t.contact.form.nameLabel}: ${formName}\n${t.contact.form.companyLabel}: ${formCompany}\n${t.contact.form.emailLabel}: ${formEmail}\n${t.contact.form.topicLabel}: ${formTopic}\n\n${formMessage}`;
     const mailto = `mailto:${t.contact.email}?subject=${encodeURIComponent(t.contact.emailSubject)}&body=${encodeURIComponent(body)}`;
-    window.open(mailto, '_blank');
-    toastStore.push(t.contact.form.emailSent, 'success');
+    const mailWindow = window.open(mailto, '_blank');
+    if (!mailWindow) {
+      // Popup blocked or no mail client — try direct navigation as fallback
+      window.location.href = mailto;
+    }
+    toastStore.push(t.contact.form.emailSent, 'info');
     setTimeout(() => { formSubmitting = false; }, 3000);
   }
 
@@ -77,7 +81,7 @@
 
   let auditItemCount = $derived(t.questions.items.length);
   $effect(() => {
-    // Only reset when item count actually changes (not on language switch)
+    // Reset when item count changes; stable across language switches when count is equal
     auditChecked = new Array(auditItemCount).fill(false);
   });
 
@@ -359,7 +363,7 @@
             </label>
 
             <div class="mt-4 flex flex-wrap items-center gap-3">
-              <button class="contact-send-btn" type="submit" disabled={formSubmitting} aria-disabled={formSubmitting}>
+              <button class="contact-send-btn" type="submit" disabled={formSubmitting}>
                 {t.contact.form.emailCta} →
               </button>
               <a href="mailto:{t.contact.email}" class="contact-email-fallback">{t.contact.email}</a>

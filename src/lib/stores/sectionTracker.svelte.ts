@@ -72,6 +72,8 @@ function init() {
 function destroy() {
   triggers.forEach(t => t.kill());
   triggers = [];
+  activeIndex = 0;
+  visible = false;
   initialized = false;
 }
 

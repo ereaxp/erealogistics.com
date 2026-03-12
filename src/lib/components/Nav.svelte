@@ -21,7 +21,7 @@
     }))
   );
 
-  let activeSection = $derived(sectionTracker.visible ? sectionTracker.activeSection.id : '');
+  let activeSection = $derived(sectionTracker.visible ? sectionTracker.activeSection?.id ?? '' : '');
 
   function handleScroll() {
     const next = window.scrollY > 24;

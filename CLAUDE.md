@@ -39,7 +39,7 @@ The site is a single route (`src/routes/+page.svelte`) with section-based naviga
 - Language toggle uses View Transitions API when available, with scroll-anchor correction to prevent drift
 
 ### Animation system
-- `src/lib/animations/gsap.ts` — Core animation functions (`revealOnScroll`, `staggerReveal`, `lineReveal`, `clipReveal`, `ambientParallax`, `countUpOnScroll`) with shared constants for easing, duration, offsets, stagger, and trigger positions
+- `src/lib/animations/gsap.ts` — Core animation functions (`revealOnScroll`, `staggerReveal`, `lineReveal`, `ambientParallax`, `countUpOnScroll`) with shared constants for easing, duration, offsets, stagger, and trigger positions
 - `src/lib/animations/actions.ts` — Svelte actions wrapping GSAP functions for declarative `use:reveal`, `use:lineReveal`, `use:stagger`, `use:parallax`, `use:countUp` directives
 - All animations respect `prefers-reduced-motion` by snapping to final state
 - ScrollTriggers are cleaned up in `+layout.svelte` on unmount

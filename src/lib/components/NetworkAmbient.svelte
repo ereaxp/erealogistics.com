@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount } from 'svelte';
   import { gsap, ScrollTrigger, prefersReducedMotion } from '$lib/animations/gsap';
 
   let containerEl: HTMLDivElement;
