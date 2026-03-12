@@ -347,11 +347,11 @@
     </div>
   </section>
 
-  <section id="contact" class="px-container py-section-sm" aria-labelledby="contact-heading">
+  <section id="contact" class="contact-section px-container" aria-labelledby="contact-heading">
     <div class="mx-auto max-w-7xl">
-      <p class="eyebrow mb-5">{t.contact.label}</p>
-      <h2 id="contact-heading" use:reveal class="text-h2 mb-3 font-serif tracking-snug" data-reveal>{t.contact.title}</h2>
-      <p use:reveal={{ delay: 0.08 }} class="text-body-lg text-text-secondary mb-6" data-reveal>{t.contact.description}</p>
+      <p class="eyebrow mb-2">{t.contact.label}</p>
+      <h2 id="contact-heading" use:reveal class="text-h2 mb-2 font-serif tracking-snug" data-reveal>{t.contact.title}</h2>
+      <p use:reveal={{ delay: 0.08 }} class="text-body-lg text-text-secondary mb-5" data-reveal>{t.contact.description}</p>
 
       <div class="grid gap-6 lg:grid-cols-[1.28fr_0.72fr] lg:items-start">
         <div class="relative">
@@ -440,7 +440,7 @@
   /* ── Route connector ── */
   .route-connector {
     position: relative;
-    height: clamp(60px, 8vw, 120px);
+    height: clamp(36px, 5vw, 64px);
     display: flex;
     justify-content: center;
     pointer-events: none;
@@ -1094,6 +1094,12 @@
     }
   }
 
+  /* ── Contact section ── */
+  .contact-section {
+    padding-top: var(--spacing-section-sm);
+    padding-bottom: clamp(48px, 6vw, 80px);
+  }
+
   /* ── Contact form document ── */
   .contact-form {
     border: 1.5px solid var(--color-border-medium);
@@ -1156,7 +1162,7 @@
 
   @media (max-width: 767px) {
     .route-connector {
-      height: 40px;
+      height: 28px;
     }
 
     .route-line {
