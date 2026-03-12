@@ -7,5 +7,7 @@
 <img
   src="{base}/group-logo.svg"
   alt="EREA Consulting Group"
+  width={Math.round(size * 2.397)}
+  height={size}
   style="height: {size}px; width: auto; display: block;"
 />

@@ -1,93 +1,27 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import { ScrollTrigger, scrollToSection } from '$lib/animations/gsap';
-
-  const sections = [
-    { id: 'about', label: 'About', num: '01' },
-    { id: 'methodology', label: 'Value', num: '02' },
-    { id: 'transformation', label: 'Transform', num: '03' },
-    { id: 'impact', label: 'Impact', num: '04' },
-    { id: 'questions', label: 'Audit', num: '05' },
-    { id: 'team', label: 'Team', num: '06' },
-    { id: 'contact', label: 'Contact', num: '07' },
-  ];
-
-  let activeIndex = $state(-1);
-  let visible = $state(false);
-  let trackerEl: HTMLElement;
-  let triggers: ScrollTrigger[] = [];
-
-  onMount(() => {
-    // Show/hide based on scroll position
-    const heroEl = document.getElementById('hero');
-    const footerEl = document.querySelector('footer');
-
-    if (heroEl) {
-      triggers.push(
-        ScrollTrigger.create({
-          trigger: heroEl,
-          start: 'bottom 20%',
-          onEnterBack: () => { if (visible) visible = false; },
-          onLeave: () => { if (!visible) visible = true; },
-        })
-      );
-    }
-
-    if (footerEl) {
-      triggers.push(
-        ScrollTrigger.create({
-          trigger: footerEl,
-          start: 'top 90%',
-          onEnter: () => { if (visible) visible = false; },
-          onLeaveBack: () => { if (!visible) visible = true; },
-        })
-      );
-    }
-
-    // Track active section
-    sections.forEach((section, i) => {
-      const el = document.getElementById(section.id);
-      if (!el) {
-        if (import.meta.env.DEV) console.warn(`ShipmentTracker: section "#${section.id}" not found`);
-        return;
-      }
-      triggers.push(
-        ScrollTrigger.create({
-          trigger: el,
-          start: 'top 50%',
-          end: 'bottom 50%',
-          onEnter: () => { if (activeIndex !== i) activeIndex = i; },
-          onEnterBack: () => { if (activeIndex !== i) activeIndex = i; },
-        })
-      );
-    });
-  });
-
-  onDestroy(() => {
-    triggers.forEach(t => t.kill());
-  });
+  import { scrollToSection } from '$lib/animations/gsap';
+  import { sectionTracker } from '$lib/stores/sectionTracker.svelte';
 
   function handleClick(id: string) {
     scrollToSection(id);
   }
 
   function getNodeState(index: number): 'completed' | 'active' | 'pending' {
-    if (activeIndex < 0) return 'pending';
-    if (index < activeIndex) return 'completed';
-    if (index === activeIndex) return 'active';
+    if (sectionTracker.activeIndex < 0) return 'pending';
+    if (index < sectionTracker.activeIndex) return 'completed';
+    if (index === sectionTracker.activeIndex) return 'active';
     return 'pending';
   }
 </script>
 
 <nav
-  bind:this={trackerEl}
   class="tracker"
-  class:tracker-visible={visible}
+  class:tracker-visible={sectionTracker.visible}
   aria-label="Section navigation"
 >
   <div class="tracker-line" aria-hidden="true"></div>
 
-  {#each sections as section, i}
+  {#each sectionTracker.sections as section, i}
     {@const state = getNodeState(i)}
     <div class="tracker-stop">
       <button
@@ -115,7 +49,7 @@
 <style>
   .tracker {
     position: fixed;
-    left: clamp(16px, 2.5vw, 40px);
+    left: clamp(12px, 1.8vw, 28px);
     top: 50%;
     transform: translateY(-50%);
     z-index: 40;
@@ -127,7 +61,7 @@
     pointer-events: none;
   }
 
-  @media (min-width: 1280px) {
+  @media (min-width: 1024px) {
     .tracker {
       display: flex;
     }
@@ -140,7 +74,7 @@
 
   .tracker-line {
     position: absolute;
-    left: 8px;
+    left: 8.5px;
     top: 8px;
     bottom: 8px;
     width: 0;

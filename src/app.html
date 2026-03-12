@@ -35,13 +35,6 @@
         src: url('%sveltekit.assets%/fonts/concourse_ot_7_bold.woff2') format('woff2');
       }
       @font-face {
-        font-family: 'Concourse';
-        font-style: normal;
-        font-weight: 800;
-        font-display: swap;
-        src: url('%sveltekit.assets%/fonts/concourse_ot_8_black.woff2') format('woff2');
-      }
-      @font-face {
         font-family: 'Equity';
         font-style: normal;
         font-weight: 400;
@@ -74,7 +67,9 @@
         } else {
           d.classList.add('fonts-ready');
         }
-        setTimeout(function() { d.classList.add('fonts-ready'); }, 400);
+        setTimeout(function() { d.classList.add('fonts-ready'); }, 200);
+        // Safety net: if GSAP fails to load or run, reveal hidden elements after 4s
+        setTimeout(function() { d.classList.add('reveal-fallback'); }, 4000);
       })();
     </script>
     %sveltekit.head%

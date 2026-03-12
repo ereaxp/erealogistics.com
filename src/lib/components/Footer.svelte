@@ -25,18 +25,18 @@
       </div>
     </div>
 
-    <nav aria-label="Footer" class="flex flex-wrap gap-x-5 gap-y-2 text-sm text-text-secondary">
-      <a href="#about" onclick={(e) => { e.preventDefault(); scrollToSection('about'); }} class="hover:text-text-primary">{t.footer.nav.about}</a>
-      <a href="#transformation" onclick={(e) => { e.preventDefault(); scrollToSection('transformation'); }} class="hover:text-text-primary">{t.footer.nav.transformation}</a>
-      <a href="#impact" onclick={(e) => { e.preventDefault(); scrollToSection('impact'); }} class="hover:text-text-primary">{t.footer.nav.impact}</a>
-      <a href="#contact" onclick={(e) => { e.preventDefault(); scrollToSection('contact'); }} class="hover:text-text-primary">{t.footer.nav.contact}</a>
+    <nav aria-label="Footer" class="flex flex-wrap gap-x-5 gap-y-1 text-sm text-text-secondary">
+      <a href="#about" onclick={(e) => { e.preventDefault(); scrollToSection('about'); }} class="inline-flex min-h-11 items-center hover:text-text-primary">{t.footer.nav.about}</a>
+      <a href="#transformation" onclick={(e) => { e.preventDefault(); scrollToSection('transformation'); }} class="inline-flex min-h-11 items-center hover:text-text-primary">{t.footer.nav.transformation}</a>
+      <a href="#impact" onclick={(e) => { e.preventDefault(); scrollToSection('impact'); }} class="inline-flex min-h-11 items-center hover:text-text-primary">{t.footer.nav.impact}</a>
+      <a href="#contact" onclick={(e) => { e.preventDefault(); scrollToSection('contact'); }} class="inline-flex min-h-11 items-center hover:text-text-primary">{t.footer.nav.contact}</a>
     </nav>
 
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-3">
       <div class="text-sm text-text-tertiary">
         &copy; {year} {t.footer.company}
       </div>
-      <span class="footer-doc-ref" aria-hidden="true">DOC: EREA-{year}</span>
+      <span class="footer-doc-ref" aria-hidden="true" lang="en">DOC: EREA-{year}</span>
     </div>
   </div>
 </footer>
@@ -54,7 +54,7 @@
   }
 
   .footer-doc-ref {
-    font-size: 0.58rem;
+    font-size: 0.56rem;
     font-weight: 600;
     letter-spacing: 0.08em;
     color: var(--color-brand-28);
@@ -79,11 +79,7 @@
 
   @media (max-width: 768px) {
     .footer-barcode {
-      display: none;
-    }
-
-    .footer-doc-ref {
-      display: none;
+      height: 11px;
     }
   }
 </style>

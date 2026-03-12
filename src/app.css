@@ -32,27 +32,38 @@
   --color-border-medium: var(--color-brand-18);
 
   --color-text-primary: #163A2D;
-  --color-text-secondary: #3A6252;
-  --color-text-tertiary: #6A867A;
+  --color-text-secondary: #2E5444;
+  --color-text-tertiary: #4A6E5E;
 
   --color-accent: #3DD384;
   --color-accent-deep: #28795A;
   --color-accent-soft: #82D4A8;
   --color-gradient-deep: #1A6B4E;
   --color-focus: #B87530;
+  --color-score-danger: #C4483E;
 
   --color-white-soft: rgba(255, 255, 255, 0.82);
   --color-white-muted: rgba(255, 255, 255, 0.74);
+  --color-white-border: rgba(255, 255, 255, 0.18);
+  --color-white-border-hover: rgba(255, 255, 255, 0.28);
+  --color-white-text: rgba(255, 255, 255, 0.65);
+  --color-white-bg-subtle: rgba(255, 255, 255, 0.06);
+
+  --color-focus-ring: rgba(184, 117, 48, 0.1);
 
   --shadow-card: 0 18px 42px var(--color-brand-5);
   --shadow-lift: 0 14px 28px var(--color-accent-18);
+  --shadow-cta: 0 2px 8px rgba(var(--color-brand-rgb), 0.2);
+  --shadow-cta-hover: 0 4px 14px rgba(var(--color-brand-rgb), 0.3);
+
+  --ease-out-expo: cubic-bezier(0.25, 1, 0.5, 1);
 
   --font-serif: 'Equity', Georgia, 'Times New Roman', serif;
   --font-sans: 'Concourse', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-  --spacing-section: clamp(88px, 10vw, 152px);
-  --spacing-section-sm: clamp(56px, 7vw, 88px);
-  --spacing-section-lg: clamp(110px, 13vw, 180px);
+  --spacing-section: clamp(56px, 7vw, 96px);
+  --spacing-section-sm: clamp(36px, 4.5vw, 56px);
+  --spacing-section-lg: clamp(72px, 9vw, 120px);
   --spacing-container: clamp(24px, 5vw, 56px);
 
   --tracking-label: 0.16em;
@@ -108,7 +119,7 @@
     outline: 2px solid var(--color-focus);
     outline-offset: -1px;
     border-color: var(--color-focus);
-    box-shadow: 0 0 0 4px rgba(184, 117, 48, 0.1);
+    box-shadow: 0 0 0 4px var(--color-focus-ring);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -128,6 +139,11 @@ html:not(.fonts-ready) [data-reveal] {
 
 noscript + * [data-reveal],
 .no-js [data-reveal] {
+  opacity: 1 !important;
+}
+
+/* Safety net: if GSAP fails to initialize within 4s, reveal all hidden elements */
+.reveal-fallback [data-reveal] {
   opacity: 1 !important;
 }
 
@@ -223,6 +239,7 @@ noscript + * [data-reveal],
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
+  min-height: 44px;
   border-radius: 4px;
   background: var(--color-accent-deep);
   color: var(--color-bg-card);
@@ -236,6 +253,7 @@ noscript + * [data-reveal],
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
+  min-height: 44px;
   border-radius: 4px;
   border: 1px solid var(--color-border-medium);
   color: var(--color-accent-deep);
@@ -300,13 +318,15 @@ noscript + * [data-reveal],
 
 .lift-on-hover {
   transition:
-    transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
-    box-shadow 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    transform 0.2s var(--ease-out-expo),
+    box-shadow 0.2s var(--ease-out-expo);
 }
 
-.lift-on-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lift);
+@media (hover: hover) {
+  .lift-on-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lift);
+  }
 }
 
 .lift-on-hover:active {
@@ -343,10 +363,12 @@ noscript + * [data-reveal],
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.manifest-line-item:hover {
-  border-left-color: var(--color-accent);
-  border-color: var(--color-accent-soft);
-  box-shadow: 0 18px 42px var(--color-accent-18);
+@media (hover: hover) {
+  .manifest-line-item:hover {
+    border-left-color: var(--color-accent);
+    border-color: var(--color-accent-soft);
+    box-shadow: 0 18px 42px var(--color-accent-18);
+  }
 }
 
 /* Dashed separator inside manifest cards */
@@ -515,7 +537,7 @@ noscript + * [data-reveal],
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
-  padding: 0.75rem 0;
+  padding: 0.5rem 0;
   border-bottom: 1px dashed var(--color-brand-10);
 }
 
@@ -526,7 +548,7 @@ noscript + * [data-reveal],
 .workflow-step-badge {
   position: absolute;
   left: -2rem;
-  top: 0.85rem;
+  top: 0.6rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -545,6 +567,6 @@ noscript + * [data-reveal],
   border: 1px solid var(--color-border-subtle);
   background: var(--color-bg-card);
   border-radius: 4px;
-  padding: 1rem;
+  padding: 0.65rem 0.85rem;
   flex: 1;
 }

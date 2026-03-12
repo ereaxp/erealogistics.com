@@ -10,8 +10,10 @@
   },
   "nav": {
     "about": "Nosotros",
+    "value": "Valor",
     "transformation": "Transformación",
     "impact": "Impacto",
+    "questions": "Reflexión",
     "team": "Equipo",
     "contact": "Contacto",
     "cta": "Hablar con un Partner"
@@ -46,13 +48,14 @@
   },
   "about": {
     "label": "QUIÉNES SOMOS",
-    "title": "Práctica especializada en Transformación de Cadenas de Suministro",
+    "title": "La práctica especializada en Transformación de Cadenas de Suministro de EREA Consulting Group",
     "paragraphs": [
-      "Erea Logistics Services es la práctica especializada en transformación de cadenas de suministro de EREA Consulting Group.",
-      "Combinamos experiencia ejecutiva, metodologías propias y el respaldo de EREA Decisions Lab para convertir la logística en un habilitador estratégico del negocio.",
+      "Combinamos experiencia ejecutiva, metodologías propias y el respaldo de <a href=\"https://erealabs.ai\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"external-link\">EREA Decisions Lab<span class=\"sr-only\"> (abre en nueva pestaña)</span></a> para convertir la logística en un habilitador estratégico del negocio.",
       "Desde el diagnóstico hasta la implementación, acompañamos a nuestros clientes en procesos de rediseño estructural que fortalecen la rentabilidad, mejoran la eficiencia operativa y preparan la organización para escalar con disciplina y control."
     ],
-    "closing": "<b>No nos limitamos a diagnosticar.</b> Diseñamos, implementamos y aseguramos resultados."
+    "disciplinesLabel": "Disciplinas",
+    "disciplines": ["Inventario", "Distribución", "Transporte", "Planificación", "Tecnología", "Automatización"],
+    "closing": "<strong>No nos limitamos a diagnosticar.</strong><br>Diseñamos, implementamos y aseguramos resultados."
   },
   "value": {
     "label": "PROPUESTA DE VALOR",
@@ -166,7 +169,7 @@
       "¿Su Centro de Distribución opera al límite de su capacidad?",
       "¿El crecimiento en ventas no se traduce proporcionalmente en crecimiento de EBITDA?"
     ],
-    "closing": "Una cadena de suministro mal diseñada no solo genera costos invisibles. <b>Limita el crecimiento estratégico</b> de la compañía.",
+    "closing": "Una cadena de suministro mal diseñada no solo genera costos invisibles. <strong>Limita el crecimiento estratégico</strong> de la compañía.",
     "cta": "Solicitar Diagnóstico Estratégico"
   },
   "cases": {
@@ -229,7 +232,7 @@
     "label": "CONTACTO",
     "title": "Conversemos sobre cómo transformar su cadena de suministro",
     "description": "Comparta un breve contexto y coordinaremos una conversación ejecutiva para evaluar oportunidades de impacto.",
-    "email": "contacto@erea.com",
+    "email": "info@ereaconsulting.com",
     "emailSubject": "Contacto - EREA Logistics Services",
     "form": {
       "nameLabel": "Nombre",
@@ -242,11 +245,9 @@
       "topicPlaceholder": "Inventario, CD, Transporte, Tecnología, S&OP…",
       "messageLabel": "Mensaje",
       "messagePlaceholder": "Cuéntenos brevemente su situación y objetivos.",
-      "submit": "Agendar Reunión",
       "emailCta": "Enviar correo",
-      "timeEstimate": "Toma menos de 2 minutos",
-      "note": "Nota: este formulario es demostrativo. Conéctelo a su CRM o backend.",
-      "demoMessage": "Formulario de ejemplo. Conéctalo a tu backend/CRM (HubSpot, Forms, etc.)."
+      "emailSent": "Cliente de correo abierto — revise su app de correo para enviar.",
+      "timeEstimate": "Toma menos de 2 minutos"
     },
     "expectations": {
       "title": "Qué puede esperar",
@@ -260,7 +261,7 @@
         "Roadmap ejecutable"
       ]
     },
-    "disclaimer": "Reemplace el correo contacto@erea.com por el oficial de EREA Logistics Services."
+    "disclaimer": "Reemplace el correo info@ereaconsulting.com por el oficial de EREA Logistics Services."
   },
   "footer": {
     "tagline": "Transformamos Cadenas de Suministro",

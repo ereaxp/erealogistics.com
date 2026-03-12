@@ -36,6 +36,11 @@
     gap: 8px;
     pointer-events: none;
   }
+  @media (min-width: 1024px) {
+    .toast-container {
+      bottom: 48px;
+    }
+  }
   .toast-item {
     display: flex;
     align-items: center;
@@ -48,14 +53,14 @@
     border-radius: 4px;
     box-shadow: 0 4px 16px var(--color-brand-10);
     pointer-events: auto;
-    animation: toast-in 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    animation: toast-in 0.3s var(--ease-out-expo);
     border-left: 3px solid var(--color-text-tertiary);
   }
   .toast-success {
     border-left-color: var(--color-accent);
   }
   .toast-warning {
-    border-left-color: var(--color-score-danger, #C4483E);
+    border-left-color: var(--color-score-danger);
   }
   .toast-message {
     flex: 1;

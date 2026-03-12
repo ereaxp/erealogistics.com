@@ -283,43 +283,6 @@
       loopC.play();
     }
 
-    // ── Route pulse — supply chain metaphor across UI elements ──
-    // Sequential green glow traces the Z-pattern: kicker → CTA → card header → KPI badges
-    const heroEl = blueprintSvg.closest('.hero-section');
-    if (heroEl) {
-      const kickerRule = heroEl.querySelector('.hero-kicker-rule');
-      const ctaBtn = heroEl.querySelector('.hero-cta-primary');
-      const proofHeader = heroEl.querySelector('.hero-proof-header');
-      const kpiBadges = heroEl.querySelectorAll('.hero-proof-ref');
-
-      const pulse = gsap.timeline({ delay: 2.8 });
-
-      const glowIn = { boxShadow: '0 0 18px 5px rgba(61, 211, 132, 0.6)' };
-      const glowOut = { boxShadow: '0 0 0 0 rgba(61, 211, 132, 0)' };
-      const dur = 0.35;
-      const ease = 'power2.out';
-
-      // Z-pattern: kicker (top-left) → card header (top-right) → KPI badges (down-right) → CTA (bottom-left)
-      if (kickerRule) {
-        pulse.to(kickerRule, { ...glowIn, duration: dur, ease });
-        pulse.to(kickerRule, { ...glowOut, duration: 0.5, ease: 'power2.in' }, '+=0.05');
-      }
-      if (proofHeader) {
-        pulse.to(proofHeader, { boxShadow: '0 -2px 14px 3px rgba(61, 211, 132, 0.45)', duration: dur, ease }, '-=0.3');
-        pulse.to(proofHeader, { ...glowOut, duration: 0.5, ease: 'power2.in' }, '+=0.05');
-      }
-      kpiBadges.forEach((badge, i) => {
-        pulse.to(badge, { boxShadow: '0 0 12px 3px rgba(61, 211, 132, 0.55)', duration: 0.3, ease }, i === 0 ? '-=0.3' : '-=0.2');
-        pulse.to(badge, { ...glowOut, duration: 0.4, ease: 'power2.in' }, '+=0.02');
-      });
-      if (ctaBtn) {
-        pulse.call(() => { (ctaBtn as HTMLElement).style.transition = 'none'; });
-        pulse.to(ctaBtn, { boxShadow: '0 0 22px 6px rgba(61, 211, 132, 0.45)', duration: 0.6, ease: 'power2.out' }, '-=0.2');
-        pulse.to(ctaBtn, { boxShadow: '0 2px 8px rgba(45, 143, 106, 0.2)', duration: 0.8, ease: 'power1.inOut' });
-        pulse.call(() => { (ctaBtn as HTMLElement).style.transition = ''; });
-      }
-    }
-
     return () => {
       tl.kill();
       shipmentTimelines.forEach(t => t.kill());
@@ -327,7 +290,7 @@
   });
 </script>
 
-<section id="hero" class="hero-section relative overflow-hidden px-container">
+<section id="hero" class="hero-section relative overflow-hidden px-container" aria-labelledby="hero-heading">
   <!-- Document margin signals -->
   <div class="hero-doc-margin" aria-hidden="true">
     <span class="hero-doc-margin-mark hero-doc-margin-top"></span>
@@ -612,6 +575,7 @@
       </div>
 
       <h1
+        id="hero-heading"
         use:reveal={{ y: 28 }}
         class="hero-title mb-8 max-w-[26ch] font-serif font-bold"
         data-reveal
@@ -668,11 +632,11 @@
     >
       <div class="hero-proof-header">
         <span class="hero-proof-header-title">{t.hero.statusBadge}</span>
-        <span class="hero-proof-header-ref" aria-hidden="true">REF: ELS-{currentYear}</span>
-        <span class="hero-proof-header-class" aria-hidden="true">FIELD DATA</span>
+        <span class="hero-proof-header-ref" aria-hidden="true" lang="en">REF: ELS-{currentYear}</span>
+        <span class="hero-proof-header-class" aria-hidden="true" lang="en">FIELD DATA</span>
       </div>
 
-      <div class="hero-proof-meta" aria-hidden="true">
+      <div class="hero-proof-meta" aria-hidden="true" lang="en">
         <span class="hero-proof-meta-field">DOC: OPS-RPT-{currentYear}-Q1</span>
         <span class="hero-proof-meta-sep">|</span>
         <span class="hero-proof-meta-field">CLASS: OPERATIONAL</span>
@@ -685,7 +649,7 @@
           {@const parsed = parseStatValue(stat.value)}
           <div class="hero-proof-stat">
             <div class="hero-proof-field-head">
-              <span class="hero-proof-ref" aria-hidden="true">KPI-0{i + 1}</span>
+              <span class="hero-proof-ref" aria-hidden="true" lang="en">KPI-0{i + 1}</span>
               <span class="hero-proof-label">{stat.label}</span>
               <span class="hero-proof-field-reg" aria-hidden="true">§{i + 1}.{(i + 1) * 2}</span>
             </div>
@@ -718,7 +682,7 @@
 
     <!-- Routing strip — full-width row inside grid -->
     <div use:reveal={{ delay: 0.24 }} class="hero-manifest-strip lg:col-span-12 mt-12" data-reveal>
-      <span class="hero-manifest-strip-label" aria-hidden="true">ROUTING</span>
+      <span class="hero-manifest-strip-label" aria-hidden="true" lang="en">ROUTING</span>
       <span class="hero-manifest-strip-rule" aria-hidden="true"></span>
       {#each t.hero.notePills as pill, i}
         <span class="hero-manifest-strip-item">
@@ -747,7 +711,7 @@
   .hero-kicker-rule {
     width: 2.4rem;
     height: 1.5px;
-    background: #2D8F6A;
+    background: var(--color-accent-deep);
   }
 
   .hero-brand-name {
@@ -755,7 +719,7 @@
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #1A1A1A;
+    color: var(--color-text-primary);
     line-height: 1;
   }
 
@@ -763,7 +727,7 @@
     margin: 0;
     padding-left: calc(2.4rem + 0.75rem);
     font-size: 0.84rem;
-    color: #666;
+    color: var(--color-text-tertiary);
     line-height: 1.3;
   }
 
@@ -773,7 +737,7 @@
     line-height: 1.08;
     letter-spacing: -0.02em;
     text-wrap: balance;
-    color: #111;
+    color: var(--color-text-primary);
   }
 
   /* ── Subtitle ── */
@@ -781,7 +745,7 @@
     font-size: clamp(1.02rem, 0.98rem + 0.25vw, 1.18rem);
     line-height: 1.48;
     letter-spacing: -0.008em;
-    color: #444;
+    color: var(--color-text-secondary);
   }
 
   /* ── Manifest routing strip ── */
@@ -790,8 +754,8 @@
     align-items: center;
     justify-content: center;
     gap: 0;
-    border-top: 1px solid #e0e0e0;
-    border-bottom: 1px solid #e0e0e0;
+    border-top: 1px solid var(--color-brand-14);
+    border-bottom: 1px solid var(--color-brand-14);
     padding: 0.4rem 0;
   }
 
@@ -800,7 +764,7 @@
     font-size: 0.56rem;
     font-weight: 700;
     letter-spacing: 0.18em;
-    color: #aaa;
+    color: var(--color-brand-36);
     text-transform: uppercase;
     flex-shrink: 0;
     padding-right: 0.6rem;
@@ -809,7 +773,7 @@
   .hero-manifest-strip-rule {
     width: 1px;
     height: 18px;
-    background: #ddd;
+    background: var(--color-border-subtle);
     flex-shrink: 0;
   }
 
@@ -822,8 +786,8 @@
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #333;
-    border-right: 1px solid #e8e8e8;
+    color: var(--color-text-primary);
+    border-right: 1px solid var(--color-brand-10);
     line-height: 1;
     white-space: nowrap;
   }
@@ -836,7 +800,7 @@
     font-family: var(--font-sans);
     font-size: 0.56rem;
     font-weight: 700;
-    color: #999;
+    color: var(--color-brand-36);
     font-variant-numeric: tabular-nums;
   }
 
@@ -845,15 +809,16 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    min-height: 44px;
     padding: 0.65rem 1.15rem 0.65rem 0;
     font-size: 0.92rem;
     font-weight: 700;
     letter-spacing: 0.02em;
     color: var(--color-bg-card);
-    background: #2D8F6A;
+    background: var(--color-accent-deep);
     border: none;
-    border-left: 2.5px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 2px 8px rgba(45, 143, 106, 0.2);
+    border-left: 2.5px solid var(--color-white-border);
+    box-shadow: var(--shadow-cta);
     text-decoration: none;
     transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   }
@@ -867,28 +832,30 @@
     font-size: 0.52rem;
     font-weight: 700;
     letter-spacing: 0.1em;
-    color: rgba(255, 255, 255, 0.65);
-    background: rgba(255, 255, 255, 0.06);
+    color: var(--color-white-text);
+    background: var(--color-white-bg-subtle);
     align-self: stretch;
   }
 
   .hero-cta-primary:hover {
-    background: #257A5A;
-    border-left-color: rgba(255, 255, 255, 0.28);
-    box-shadow: 0 4px 14px rgba(45, 143, 106, 0.3);
+    background: var(--color-gradient-deep);
+    border-left-color: var(--color-white-border-hover);
+    box-shadow: var(--shadow-cta-hover);
   }
 
   .hero-cta-primary:active {
-    background: #2D8F6A;
+    background: var(--color-accent-deep);
   }
 
   .hero-cta-arrow {
     display: inline-block;
-    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: transform 0.25s var(--ease-out-expo);
   }
 
-  .hero-cta-primary:hover .hero-cta-arrow {
-    transform: translateX(3px);
+  @media (hover: hover) {
+    .hero-cta-primary:hover .hero-cta-arrow {
+      transform: translateX(3px);
+    }
   }
 
   .hero-cta-primary:active .hero-cta-arrow {
@@ -898,7 +865,7 @@
   /* ── Secondary link ── */
   .hero-secondary-link {
     position: relative;
-    color: #555;
+    color: var(--color-text-secondary);
     font-size: clamp(0.95rem, 0.94rem + 0.1vw, 1.04rem);
     text-decoration: none;
   }
@@ -910,17 +877,19 @@
     left: 50%;
     width: 0;
     height: 1.5px;
-    background: #333;
-    transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1), left 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    background: var(--color-text-primary);
+    transition: width 0.3s var(--ease-out-expo), left 0.3s var(--ease-out-expo);
   }
 
-  .hero-secondary-link:hover {
-    color: #111;
-  }
+  @media (hover: hover) {
+    .hero-secondary-link:hover {
+      color: var(--color-text-primary);
+    }
 
-  .hero-secondary-link:hover::after {
-    width: 100%;
-    left: 0;
+    .hero-secondary-link:hover::after {
+      width: 100%;
+      left: 0;
+    }
   }
 
   /* ── Blueprint SVG ── */
@@ -1000,7 +969,7 @@
   }
 
   .hero-blueprint-map .hub {
-    fill: #fdfcf9;
+    fill: var(--color-bg-card);
     stroke: var(--color-brand-52);
     stroke-width: 1.5;
   }
@@ -1119,7 +1088,7 @@
     left: 0;
     width: 8px;
     height: 1px;
-    background: #ccc;
+    background: var(--color-brand-22);
   }
 
   .hero-doc-margin-top {
@@ -1171,7 +1140,7 @@
   /* ── Metrics manifest panel ── */
   .hero-proof-band {
     background: var(--color-bg-card);
-    border: 1.5px solid #d4d4d4;
+    border: 1.5px solid var(--color-border-medium);
     position: relative;
     z-index: 2;
   }
@@ -1190,8 +1159,8 @@
     left: -8px;
     width: 24px;
     height: 24px;
-    border-top: 2px solid #aaa;
-    border-left: 2px solid #aaa;
+    border-top: 2px solid var(--color-brand-36);
+    border-left: 2px solid var(--color-brand-36);
   }
 
   .hero-proof-band::after {
@@ -1199,8 +1168,8 @@
     right: -5px;
     width: 14px;
     height: 14px;
-    border-bottom: 1.5px solid #bbb;
-    border-right: 1.5px solid #bbb;
+    border-bottom: 1.5px solid var(--color-brand-28);
+    border-right: 1.5px solid var(--color-brand-28);
   }
 
   /* Stamped document header */
@@ -1208,10 +1177,10 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.65rem 1rem;
-    background: #fafafa;
-    border-top: 2px solid #2D8F6A;
-    border-bottom: 1.5px solid #ddd;
+    padding: 0.55rem 1rem;
+    background: var(--color-bg-secondary);
+    border-top: 2px solid var(--color-accent-deep);
+    border-bottom: 1px solid var(--color-border-subtle);
   }
 
   .hero-proof-header-title {
@@ -1219,14 +1188,14 @@
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: #1A1A1A;
+    color: var(--color-text-primary);
   }
 
   .hero-proof-header-ref {
-    font-size: 0.56rem;
+    font-size: 0.5rem;
     font-weight: 600;
     letter-spacing: 0.08em;
-    color: #999;
+    color: var(--color-brand-36);
     font-variant-numeric: tabular-nums;
   }
 
@@ -1236,8 +1205,8 @@
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: #999;
-    border: 1px solid #ddd;
+    color: var(--color-brand-36);
+    border: 1px solid var(--color-border-subtle);
     padding: 0.1rem 0.4rem;
     line-height: 1.3;
   }
@@ -1247,8 +1216,9 @@
     align-items: center;
     gap: 0.4rem;
     padding: 0.3rem 1rem;
-    border-bottom: 1px dashed #e5e5e5;
-    background: #fafafa;
+    border-bottom: 1px dashed var(--color-brand-14);
+    background: var(--color-bg-secondary);
+    overflow: hidden;
   }
 
   .hero-proof-meta-field {
@@ -1256,13 +1226,13 @@
     font-size: 0.5rem;
     font-weight: 600;
     letter-spacing: 0.1em;
-    color: #999;
+    color: var(--color-brand-36);
     font-variant-numeric: tabular-nums;
   }
 
   .hero-proof-meta-sep {
     font-size: 0.5rem;
-    color: #ddd;
+    color: var(--color-brand-22);
   }
 
   .hero-proof-grid {
@@ -1282,9 +1252,11 @@
     transition: border-color 0.2s;
   }
 
-  .hero-proof-stat:hover {
-    border-left-color: #2D8F6A;
-    background: #fafafa;
+  @media (hover: hover) {
+    .hero-proof-stat:hover {
+      border-left-color: var(--color-accent-deep);
+      background: var(--color-bg-secondary);
+    }
   }
 
   /* Dashed field separators — manifest style */
@@ -1294,7 +1266,7 @@
     top: 0;
     left: 0;
     right: 0;
-    border-top: 1.5px dashed #e0e0e0;
+    border-top: 1.5px dashed var(--color-brand-14);
   }
 
   .hero-proof-field-head {
@@ -1302,6 +1274,7 @@
     align-items: baseline;
     gap: 0.5rem;
     margin-bottom: 0.45rem;
+    min-width: 0;
   }
 
   .hero-proof-ref {
@@ -1310,19 +1283,21 @@
     font-weight: 700;
     letter-spacing: 0.06em;
     color: var(--color-bg-card);
-    background: #2D8F6A;
+    background: var(--color-accent-deep);
     padding: 0.1rem 0.35rem;
     border-radius: 2px;
     line-height: 1.4;
   }
 
   .hero-proof-label {
-    color: #555;
+    color: var(--color-text-secondary);
     font-size: 0.64rem;
     font-weight: 600;
     letter-spacing: 0.10em;
     text-transform: uppercase;
     line-height: 1.3;
+    min-width: 0;
+    overflow-wrap: break-word;
   }
 
   .hero-proof-field-reg {
@@ -1330,7 +1305,7 @@
     font-size: 0.48rem;
     font-weight: 600;
     letter-spacing: 0.04em;
-    color: #bbb;
+    color: var(--color-brand-28);
     margin-left: auto;
     font-variant-numeric: tabular-nums;
   }
@@ -1344,15 +1319,15 @@
   .hero-proof-arrow {
     width: 16px;
     height: 16px;
-    color: #2D8F6A;
+    color: var(--color-accent-deep);
     flex-shrink: 0;
     opacity: 0.8;
   }
 
   .hero-proof-value {
-    color: #111;
-    font-family: var(--font-sans);
-    font-weight: 800;
+    color: var(--color-text-primary);
+    font-family: var(--font-serif);
+    font-weight: 700;
     font-size: clamp(1.8rem, 2.4vw, 2.4rem);
     line-height: 1;
     letter-spacing: -0.02em;
@@ -1360,7 +1335,7 @@
   }
 
   .hero-proof-footer {
-    border-top: 1.5px solid #e0e0e0;
+    border-top: 1px solid var(--color-border-subtle);
     padding: 0.6rem 1rem;
     display: flex;
     align-items: center;
@@ -1369,7 +1344,7 @@
 
 .hero-proof-note {
     font-size: 0.66rem;
-    color: #888;
+    color: var(--color-text-tertiary);
     letter-spacing: 0.01em;
     flex: 1;
   }
@@ -1379,7 +1354,7 @@
     font-size: 0.5rem;
     font-weight: 600;
     letter-spacing: 0.06em;
-    color: #bbb;
+    color: var(--color-brand-28);
     font-variant-numeric: tabular-nums;
     flex-shrink: 0;
   }
@@ -1465,10 +1440,6 @@
 
     .hero-secondary-link::after {
       transition: none;
-    }
-
-    .scroll-prompt {
-      animation: none;
     }
 
     .hero-blueprint-map .hub-pulse {

@@ -11,8 +11,10 @@
 
   const sections = [
     { id: 'about', key: 'about' as const },
+    { id: 'methodology', key: 'value' as const },
     { id: 'transformation', key: 'transformation' as const },
     { id: 'impact', key: 'impact' as const },
+    { id: 'questions', key: 'questions' as const },
     { id: 'team', key: 'team' as const },
     { id: 'contact', key: 'contact' as const }
   ];
@@ -104,7 +106,7 @@
         <a
           href="#{section.id}"
           onclick={(e) => { e.preventDefault(); scrollTo(section.id); }}
-          aria-current={section.id === activeSection ? 'true' : undefined}
+          aria-current={section.id === activeSection ? 'location' : undefined}
           class="text-label uppercase transition-colors duration-200 hover:text-text-primary {section.id === activeSection ? 'font-semibold text-accent-deep' : 'text-text-secondary'}"
         >
           {t.nav[section.key]}
@@ -149,9 +151,9 @@
           <a
             href="#{section.id}"
             onclick={(e) => { e.preventDefault(); scrollTo(section.id); }}
-            aria-current={section.id === activeSection ? 'true' : undefined}
+            aria-current={section.id === activeSection ? 'location' : undefined}
             tabindex={mobileOpen ? 0 : -1}
-            class="mobile-nav-link py-2.5 text-label uppercase transition-colors duration-200 hover:text-text-primary {section.id === activeSection ? 'mobile-nav-link-active text-accent-deep' : 'text-text-secondary'}"
+            class="mobile-nav-link min-h-11 flex items-center text-label uppercase transition-colors duration-200 hover:text-text-primary {section.id === activeSection ? 'mobile-nav-link-active text-accent-deep' : 'text-text-secondary'}"
             style="transition-delay: {mobileOpen ? i * 40 : 0}ms;"
           >
             {t.nav[section.key]}
@@ -174,7 +176,12 @@
 
 <style>
   .nav-lang-toggle {
-    padding: 0.25rem 0.5rem;
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
     border: none;
   }
 
@@ -186,7 +193,7 @@
   .mobile-menu {
     display: grid;
     grid-template-rows: 0fr;
-    transition: grid-template-rows 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: grid-template-rows 0.35s var(--ease-out-expo);
   }
 
   .mobile-menu-open {
@@ -201,7 +208,7 @@
   .mobile-menu :global(.button-primary) {
     opacity: 0;
     transform: translateY(-6px);
-    transition: opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1), transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), color 0.2s ease;
+    transition: opacity 0.25s var(--ease-out-expo), transform 0.25s var(--ease-out-expo), color 0.2s ease;
   }
 
   .mobile-menu-open .mobile-nav-link,

@@ -10,8 +10,10 @@
   },
   "nav": {
     "about": "About",
+    "value": "Value",
     "transformation": "Transformation",
     "impact": "Impact",
+    "questions": "Reflection",
     "team": "Team",
     "contact": "Contact",
     "cta": "Speak with a Partner"
@@ -46,13 +48,14 @@
   },
   "about": {
     "label": "ABOUT",
-    "title": "A specialized practice in Supply Chain Transformation",
+    "title": "EREA Consulting Group\u2019s specialized practice in Supply Chain Transformation",
     "paragraphs": [
-      "Erea Logistics Services is EREA Consulting Group\u2019s specialized practice for supply chain transformation.",
-      "We combine executive experience, proprietary methodologies, and the support of EREA Decisions Lab to make logistics a strategic business enabler.",
+      "We combine executive experience, proprietary methodologies, and the support of <a href=\"https://erealabs.ai\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"external-link\">EREA Decisions Lab<span class=\"sr-only\"> (opens in new tab)</span></a> to make logistics a strategic business enabler.",
       "From diagnosis through implementation, we lead structural redesigns that strengthen profitability, improve operational efficiency, and prepare organizations to scale with discipline and control."
     ],
-    "closing": "<b>We don\u2019t stop at diagnosis.</b> We design, implement, and ensure results."
+    "disciplinesLabel": "Disciplines",
+    "disciplines": ["Inventory", "Distribution", "Transportation", "Planning", "Technology", "Automation"],
+    "closing": "<strong>We don\u2019t stop at diagnosis.</strong><br>We design, implement, and ensure results."
   },
   "value": {
     "label": "VALUE PROPOSITION",
@@ -166,7 +169,7 @@
       "Is your distribution center operating at capacity limits?",
       "Does sales growth fail to translate proportionally into EBITDA growth?"
     ],
-    "closing": "A poorly designed supply chain doesn\u2019t just create hidden costs. It <b>caps strategic growth</b>.",
+    "closing": "A poorly designed supply chain doesn\u2019t just create hidden costs. It <strong>caps strategic growth</strong>.",
     "cta": "Request a Strategic Diagnosis"
   },
   "cases": {
@@ -229,7 +232,7 @@
     "label": "CONTACT",
     "title": "Let\u2019s discuss how to transform your supply chain",
     "description": "Share brief context and we\u2019ll coordinate an executive conversation to assess impact opportunities.",
-    "email": "contacto@erea.com",
+    "email": "info@ereaconsulting.com",
     "emailSubject": "Contact - EREA Logistics Services",
     "form": {
       "nameLabel": "Name",
@@ -242,11 +245,9 @@
       "topicPlaceholder": "Inventory, DC, Transportation, Technology, S&OP\u2026",
       "messageLabel": "Message",
       "messagePlaceholder": "Briefly describe your situation and objectives.",
-      "submit": "Schedule a Meeting",
       "emailCta": "Send email",
-      "timeEstimate": "Takes less than 2 minutes",
-      "note": "Note: this is a demo form. Connect it to your CRM or backend.",
-      "demoMessage": "Example form. Connect it to your backend/CRM (HubSpot, Forms, etc.)."
+      "emailSent": "Email client opened — check your mail app to send.",
+      "timeEstimate": "Takes less than 2 minutes"
     },
     "expectations": {
       "title": "What to expect",
@@ -260,7 +261,7 @@
         "Executable roadmap"
       ]
     },
-    "disclaimer": "Replace contacto@erea.com with EREA Logistics Services' official email."
+    "disclaimer": "Replace info@ereaconsulting.com with EREA Logistics Services' official email."
   },
   "footer": {
     "tagline": "We Transform Supply Chains",
