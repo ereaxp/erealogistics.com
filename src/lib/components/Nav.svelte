@@ -93,7 +93,7 @@
       {/each}
     </div>
 
-    <div class="flex items-center justify-end gap-2 sm:gap-3">
+    <div class="col-start-3 flex items-center justify-end gap-2 sm:gap-3">
       <button
         onclick={() => lang.toggle()}
         class="nav-lang-toggle text-label uppercase text-text-tertiary transition-colors duration-200 hover:text-text-primary"
@@ -104,15 +104,15 @@
 
       <button
         bind:this={hamburgerBtn}
-        class="flex min-h-11 min-w-11 flex-col items-center justify-center gap-1.5 border-none bg-transparent p-2 opacity-80 transition-opacity duration-200 hover:opacity-100 lg:hidden"
+        class="flex min-h-11 min-w-11 flex-col items-center justify-center gap-1.5 border-none bg-transparent p-2 -mr-2 opacity-80 transition-opacity duration-200 hover:opacity-100 lg:hidden"
         onclick={() => (mobileOpen = !mobileOpen)}
         aria-expanded={mobileOpen}
         aria-controls="mobile-menu"
         aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
       >
-        <span class="block h-[2px] w-5 bg-text-primary transition-all duration-300" style="transform: {mobileOpen ? 'rotate(45deg) translateY(4px)' : 'none'}"></span>
+        <span class="block h-[2px] w-5 origin-center bg-text-primary transition-all duration-300" style="transform: {mobileOpen ? 'translateY(8px) rotate(45deg)' : 'none'}"></span>
         <span class="block h-[2px] w-5 bg-text-primary transition-all duration-300" style="opacity: {mobileOpen ? 0 : 1}"></span>
-        <span class="block h-[2px] w-5 bg-text-primary transition-all duration-300" style="transform: {mobileOpen ? 'rotate(-45deg) translateY(-4px)' : 'none'}"></span>
+        <span class="block h-[2px] w-5 origin-center bg-text-primary transition-all duration-300" style="transform: {mobileOpen ? 'translateY(-8px) rotate(-45deg)' : 'none'}"></span>
       </button>
     </div>
   </div>

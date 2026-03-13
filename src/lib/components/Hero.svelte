@@ -1134,7 +1134,7 @@
     min-height: 100svh;
     display: flex;
     flex-direction: column;
-    padding-top: clamp(48px, 5vw, 64px);
+    padding-top: clamp(88px, 8vw, 104px);
   }
 
   .hero-content {
