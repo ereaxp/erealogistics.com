@@ -571,7 +571,7 @@
           <span class="hero-kicker-rule" aria-hidden="true"></span>
           <p class="hero-brand-name mb-0">{t.hero.kicker}</p>
         </div>
-        <p class="hero-kicker-sub">{t.hero.kickerSub}</p>
+        <p class="hero-kicker-sub">{@html t.hero.kickerSub}</p>
       </div>
 
       <h1
@@ -729,6 +729,47 @@
     font-size: 0.84rem;
     color: var(--color-text-tertiary);
     line-height: 1.3;
+  }
+
+  .hero-kicker-sub :global(a.external-link) {
+    color: var(--color-accent-deep);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-brand-22);
+    transition: border-color 0.2s ease;
+  }
+
+  @media (hover: hover) {
+    .hero-kicker-sub :global(a.external-link:hover) {
+      border-bottom-color: var(--color-accent-deep);
+    }
+  }
+
+  .hero-kicker-sub :global(a.external-link)::after {
+    content: '↗';
+    display: inline-block;
+    font-size: 0.72em;
+    margin-left: 0.2em;
+    opacity: 0.55;
+    transition: opacity 0.2s ease;
+  }
+
+  @media (hover: hover) {
+    .hero-kicker-sub :global(a.external-link:hover)::after {
+      opacity: 1;
+    }
+  }
+
+  .hero-kicker-sub :global(.sr-only) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
   }
 
   /* ── Headline ── */

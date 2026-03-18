@@ -7,10 +7,8 @@
   import NetworkAmbient from '$lib/components/NetworkAmbient.svelte';
 
   import ShipmentTracker from '$lib/components/ShipmentTracker.svelte';
-  import ShippingLabel from '$lib/components/ShippingLabel.svelte';
   import { reveal, stagger, countUp, lineReveal } from '$lib/animations/actions';
   import { gsap, ScrollTrigger, scrollToSection, prefersReducedMotion } from '$lib/animations/gsap';
-  import { toastStore } from '$lib/stores/toast.svelte';
   import { getContent } from '$lib/stores/lang.svelte';
   import { sectionTracker } from '$lib/stores/sectionTracker.svelte';
 
@@ -26,40 +24,6 @@
   let auditCount = $derived(auditChecked.filter(Boolean).length);
   let routeConnectors = $state<HTMLDivElement[]>([]);
   const currentYear = new Date().getFullYear();
-
-  let showLabel = $state(false);
-  let labelData = $state({ name: '', company: '', email: '' });
-  let formSubmitting = $state(false);
-
-  function handleDemoSubmit(event: SubmitEvent) {
-    event.preventDefault();
-    if (formSubmitting) return;
-    formSubmitting = true;
-    const form = event.target as HTMLFormElement;
-    const data = new FormData(form);
-    const formName = (data.get('name') as string) || '';
-    const formCompany = (data.get('company') as string) || '';
-    const formEmail = (data.get('email') as string) || '';
-    const formTopic = (data.get('topic') as string) || '';
-    const formMessage = (data.get('message') as string) || '';
-
-    labelData = { name: formName, company: formCompany, email: formEmail };
-    showLabel = true;
-
-    const body = `${t.contact.form.nameLabel}: ${formName}\n${t.contact.form.companyLabel}: ${formCompany}\n${t.contact.form.emailLabel}: ${formEmail}\n${t.contact.form.topicLabel}: ${formTopic}\n\n${formMessage}`;
-    const mailto = `mailto:${t.contact.email}?subject=${encodeURIComponent(t.contact.emailSubject)}&body=${encodeURIComponent(body)}`;
-    const mailWindow = window.open(mailto, '_blank');
-    if (!mailWindow) {
-      // Popup blocked or no mail client — try direct navigation as fallback
-      window.location.href = mailto;
-    }
-    toastStore.push(t.contact.form.emailSent, 'info');
-    setTimeout(() => { formSubmitting = false; }, 3000);
-  }
-
-  function handleLabelComplete() {
-    setTimeout(() => { showLabel = false; }, 1800);
-  }
 
   function animateConnector(el: HTMLDivElement) {
     const line = el.querySelector('.route-line line') as SVGLineElement;
@@ -350,83 +314,41 @@
   <section id="contact" class="contact-section px-container" aria-labelledby="contact-heading">
     <div class="mx-auto max-w-7xl">
       <p class="eyebrow mb-2">{t.contact.label}</p>
-      <h2 id="contact-heading" use:reveal class="text-h2 mb-2 font-serif tracking-snug" data-reveal>{t.contact.title}</h2>
-      <p use:reveal={{ delay: 0.08 }} class="text-body-lg text-text-secondary mb-5" data-reveal>{t.contact.description}</p>
 
-      <div class="grid gap-6 lg:grid-cols-[1.28fr_0.72fr] lg:items-start">
-        <div class="relative">
-        <form onsubmit={handleDemoSubmit} class="contact-form">
-          <div class="contact-form-header" lang="en">
-            <span class="contact-form-header-title">CONTACT FORM</span>
-            <span class="contact-form-header-ref" aria-hidden="true">DOC: ELS-CTF-{currentYear}</span>
-            <span class="contact-form-header-time">
-              <svg class="inline-block flex-none" width="10" height="10" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="6"/><path d="M7 4v3l2 1.5"/></svg>
-              {t.contact.form.timeEstimate}
-            </span>
-          </div>
-          <div class="contact-form-body">
-            <div class="grid gap-3 md:grid-cols-2">
-              <label class="block text-sm font-medium text-text-primary">
-                <span class="mb-1 block">{t.contact.form.nameLabel}</span>
-                <input class="w-full rounded-[4px] border border-border-subtle bg-bg-card px-3 py-2.5" name="name" autocomplete="name" placeholder={t.contact.form.namePlaceholder} required maxlength={120} />
-              </label>
+      <div class="flex flex-col items-center text-center max-w-3xl mx-auto">
+        <p
+          use:reveal
+          class="text-h2 font-serif leading-relaxed mb-8 tracking-snug"
+          data-reveal
+        >
+          {t.contact.body}
+        </p>
 
-              <label class="block text-sm font-medium text-text-primary">
-                <span class="mb-1 block">{t.contact.form.companyLabel}</span>
-                <input class="w-full rounded-[4px] border border-border-subtle bg-bg-card px-3 py-2.5" name="company" autocomplete="organization" placeholder={t.contact.form.companyPlaceholder} required maxlength={120} />
-              </label>
+        <div
+          use:reveal={{ delay: 0.15 }}
+          class="w-full mb-6"
+          style="height: 1px; background: var(--color-border-subtle);"
+          data-reveal
+        ></div>
 
-              <label class="block text-sm font-medium text-text-primary">
-                <span class="mb-1 block">{t.contact.form.emailLabel}</span>
-                <input class="w-full rounded-[4px] border border-border-subtle bg-bg-card px-3 py-2.5" name="email" type="email" autocomplete="email" placeholder={t.contact.form.emailPlaceholder} required maxlength={254} />
-              </label>
+        <a
+          use:reveal={{ delay: 0.2 }}
+          href="mailto:{t.contact.email}?subject={encodeURIComponent(t.contact.emailSubject)}"
+          class="contact-email-link"
+          data-reveal
+        >
+          {t.contact.email} <span aria-hidden="true">→</span>
+        </a>
 
-              <label class="block text-sm font-medium text-text-primary">
-                <span class="mb-1 block">{t.contact.form.topicLabel}</span>
-                <input class="w-full rounded-[4px] border border-border-subtle bg-bg-card px-3 py-2.5" name="topic" placeholder={t.contact.form.topicPlaceholder} required maxlength={200} />
-              </label>
-            </div>
-
-            <label class="mt-3 block text-sm font-medium text-text-primary">
-              <span class="mb-1 block">{t.contact.form.messageLabel}</span>
-              <textarea class="min-h-[56px] w-full resize-y rounded-[4px] border border-border-subtle bg-bg-card px-3 py-2.5" name="message" placeholder={t.contact.form.messagePlaceholder} maxlength={2000}></textarea>
-            </label>
-
-            <div class="mt-4 flex flex-wrap items-center gap-3">
-              <button class="contact-send-btn" type="submit" disabled={formSubmitting}>
-                {t.contact.form.emailCta} →
-              </button>
-              <a href="mailto:{t.contact.email}" class="contact-email-fallback">{t.contact.email}</a>
-            </div>
-          </div>
-          <div class="contact-form-footer" lang="en">
-            <span>DOC: ELS-CTF-{currentYear}</span>
-            <span>REV: 01</span>
-          </div>
-        </form>
-        {#if showLabel}
-          <div class="contact-label-overlay" role="status" aria-label="Shipment confirmation">
-            <ShippingLabel name={labelData.name} company={labelData.company} email={labelData.email} onComplete={handleLabelComplete} />
-          </div>
-        {/if}
-        </div>
-
-        <div use:reveal data-reveal>
-          <h3 class="mb-2 text-[1.15rem] font-semibold">{t.contact.expectations.title}</h3>
-          {#each t.contact.expectations.paragraphs as paragraph}
-            <p class="text-body text-text-secondary not-last:mb-3">{paragraph}</p>
-          {/each}
-
-          <div class="mt-4 border-t border-brand-10">
-            {#each t.contact.expectations.bullets as bullet}
-              <div class="flex items-center gap-2 border-b border-dashed border-brand-10 py-2">
-                <span class="text-sm font-medium text-accent-deep">{bullet}</span>
-                <span aria-hidden="true" class="ml-auto text-xs text-accent">✓</span>
-              </div>
-            {/each}
-          </div>
-
-        </div>
+        <a
+          use:reveal={{ delay: 0.25 }}
+          href="tel:{t.contact.phone.replace(/\s/g, '')}"
+          class="text-body text-text-secondary no-underline"
+          style="transition: color 0.2s ease;"
+          data-reveal
+        >
+          {t.contact.phone}
+        </a>
       </div>
     </div>
   </section>
@@ -1039,125 +961,28 @@
     font-variant-numeric: tabular-nums;
   }
 
-  .contact-label-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--color-bg-card);
-    border: 1.5px solid var(--color-border-medium);
-    border-top: 2px solid var(--color-accent-deep);
-  }
-
-  .contact-send-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.65rem 1.25rem;
-    min-height: 44px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--color-bg-card);
-    background: var(--color-accent-deep);
-    border: none;
-    border-radius: 4px;
-    text-decoration: none;
-    transition: background-color 0.15s ease;
-  }
-
-  @media (hover: hover) {
-    .contact-send-btn:hover:not(:disabled) {
-      background: var(--color-gradient-deep);
-    }
-  }
-
-  .contact-send-btn:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-  }
-
-  .contact-email-fallback {
-    font-size: 0.78rem;
-    color: var(--color-text-tertiary);
-    text-decoration: none;
-    border-bottom: 1px dashed var(--color-brand-22);
-    transition: color 0.15s ease, border-color 0.15s ease;
-  }
-
-  @media (hover: hover) {
-    .contact-email-fallback:hover {
-      color: var(--color-accent-deep);
-      border-bottom-style: solid;
-      border-color: var(--color-accent-deep);
-    }
-  }
-
   /* ── Contact section ── */
   .contact-section {
-    padding-top: var(--spacing-section-sm);
-    padding-bottom: clamp(48px, 6vw, 80px);
+    padding-top: clamp(64px, 8vw, 120px);
+    padding-bottom: clamp(64px, 8vw, 120px);
   }
 
-  /* ── Contact form document ── */
-  .contact-form {
-    border: 1.5px solid var(--color-border-medium);
-    background: var(--color-bg-card);
-  }
-
-  .contact-form-header {
-    display: flex;
+  .contact-email-link {
+    display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.55rem 1rem;
-    background: var(--color-bg-secondary);
-    border-top: 2px solid var(--color-accent-deep);
-    border-bottom: 1px solid var(--color-border-subtle);
+    font-family: var(--font-serif);
+    font-size: clamp(1.15rem, 1.1rem + 0.3vw, 1.4rem);
+    color: var(--color-accent-deep);
+    text-decoration: none;
+    margin-bottom: 0.75rem;
+    transition: color 0.2s ease;
   }
 
-  .contact-form-header-title {
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--color-text-primary);
-  }
-
-  .contact-form-header-ref {
-    font-size: 0.5rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    color: var(--color-brand-36);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .contact-form-header-time {
-    margin-left: auto;
-    font-size: 0.56rem;
-    font-weight: 500;
-    color: var(--color-brand-36);
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-  }
-
-  .contact-form-body {
-    padding: 0.85rem 1rem;
-  }
-
-  .contact-form-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.4rem 1rem;
-    background: var(--color-bg-secondary);
-    border-top: 1px solid var(--color-border-subtle);
-    font-size: 0.48rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    color: var(--color-brand-28);
-    font-variant-numeric: tabular-nums;
+  @media (hover: hover) {
+    .contact-email-link:hover {
+      color: var(--color-text-primary);
+    }
   }
 
   @media (max-width: 767px) {

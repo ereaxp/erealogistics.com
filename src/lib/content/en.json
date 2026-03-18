@@ -21,7 +21,7 @@
   },
   "hero": {
     "kicker": "EREA LOGISTICS SERVICES",
-    "kickerSub": "An EREA Consulting Group practice",
+    "kickerSub": "An <a href=\"https://ereaconsulting.com/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"external-link\">EREA Consulting Group<span class=\"sr-only\"> (opens in new tab)</span></a> practice",
     "title": "We Turn Supply Chains into Measurable Competitive Advantages",
     "subtitle": "We design and implement solutions that reduce structural costs, release working capital, and elevate service levels\u2014integrating strategy, technology, and advanced analytics.",
     "ctaPrimary": "Speak with a Partner",
@@ -232,38 +232,10 @@
   },
   "contact": {
     "label": "CONTACT",
-    "title": "Let\u2019s discuss how to transform your supply chain",
-    "description": "Share brief context and we\u2019ll coordinate an executive conversation to assess impact opportunities.",
+    "body": "Share brief context about your supply chain and we\u2019ll coordinate an executive conversation to assess impact opportunities.",
     "email": "info@ereaconsulting.com",
     "emailSubject": "Contact - EREA Logistics Services",
-    "form": {
-      "nameLabel": "Name",
-      "namePlaceholder": "Full name",
-      "companyLabel": "Company",
-      "companyPlaceholder": "Company name",
-      "emailLabel": "Email",
-      "emailPlaceholder": "name@company.com",
-      "topicLabel": "Topic",
-      "topicPlaceholder": "Inventory, DC, Transportation, Technology, S&OP\u2026",
-      "messageLabel": "Message",
-      "messagePlaceholder": "Briefly describe your situation and objectives.",
-      "emailCta": "Send email",
-      "emailSent": "Email client opened — check your mail app to send.",
-      "timeEstimate": "Takes less than 2 minutes"
-    },
-    "expectations": {
-      "title": "What to expect",
-      "paragraphs": [
-        "A short executive conversation to understand context, identify impact opportunities, and define the best work path.",
-        "Institutional, technical and results-driven approach."
-      ],
-      "bullets": [
-        "Confidentiality",
-        "Clear diagnosis",
-        "Executable roadmap"
-      ]
-    },
-    "disclaimer": "Replace info@ereaconsulting.com with EREA Logistics Services' official email."
+    "phone": "+51 950 049 708"
   },
   "footer": {
     "tagline": "We Transform Supply Chains",
